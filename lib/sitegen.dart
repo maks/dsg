@@ -16,7 +16,7 @@ import 'package:validate/validate.dart';
 
 import "package:path/path.dart" as path;
 import "package:markdown/markdown.dart" as md;
-import "package:mustache/mustache.dart" as mustache;
+import "package:reflected_mustache/mustache.dart" as mustache;
 import "package:yaml/yaml.dart" as yaml;
 
 import 'package:http_server/http_server.dart';
@@ -36,11 +36,7 @@ bool _runsOnOSX() => (SysInfo.operatingSystemName == "Mac OS X");
 // final _commands = new List<CommandWrapper>();
 
 Future main(List<String> arguments) async {
-    final Application application = new Application();
+  final Application application = new Application();
 
-    application.run( arguments );
+  application.run(arguments);
 }
-
-
-
-
