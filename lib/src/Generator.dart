@@ -66,8 +66,15 @@ class Generator {
                     final String block = yamlBlock.join('\n');
                     final yaml.YamlMap ym = yaml.loadYaml(block);
 
-                    pageOptions.addAll(ym.map((key,value)
-                        => MapEntry<String,String>(key.toString(),value.toString())));
+                    pageOptions.addAll(ym.map((key, value) {
+                      if (value is yaml.YamlList) {
+                        return MapEntry<String, yaml.YamlList>(key.toString(), value);
+                      }
+                      if (value is yaml.YamlMap) {
+                        return MapEntry<String, yaml.YamlMap>(key.toString(), value);
+                      }
+                        return MapEntry<String, String>(key.toString(), value.toString());
+                    }));
 
                     _resolvePartialsInYamlBlock(partialsDir,pageOptions,config.usemarkdown);
 
