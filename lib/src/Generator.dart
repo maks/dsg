@@ -246,7 +246,9 @@ class Generator {
 
             file.path.endsWith('.png') ||
             file.path.endsWith(".jpg") ||
-            file.path.endsWith(".gif")
+            file.path.endsWith(".gif") ||
+            file.path.endsWith(".woff") || 
+            file.path.endsWith(".tff") 
 
         ) && !file.path.contains("packages") )
             .map((final FileSystemEntity entity) => entity as File)
