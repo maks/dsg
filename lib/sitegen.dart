@@ -7,6 +7,7 @@ import 'dart:math';
 
 import 'package:intl/intl.dart';
 import 'package:args/args.dart';
+import 'package:markdown/markdown.dart';
 import 'package:where/where.dart';
 
 import 'package:logging/logging.dart';

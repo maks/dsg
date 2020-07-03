@@ -96,7 +96,10 @@ class Generator {
 
             String outputExtension = extension;
             if (isMarkdown(file) && _isMarkdownSupported(config.usemarkdown, pageOptions)) {
-                pageOptions['_content'] = md.markdownToHtml(pageOptions['_content']);
+                pageOptions['_content'] = md.markdownToHtml(pageOptions['_content'], 
+                  inlineSyntaxes: [InlineHtmlSyntax()],
+                  extensionSet: ExtensionSet.gitHubWeb
+                );
                 outputExtension = "html";
             }
 
@@ -193,7 +196,10 @@ class Generator {
             } else if(partialMd.existsSync()) {
                 content = partialMd.readAsStringSync();
                 if(isMarkdownSupported) {
-                    content = md.markdownToHtml(content);
+                    content = md.markdownToHtml(content, 
+                      inlineSyntaxes: [InlineHtmlSyntax()],
+                      extensionSet: ExtensionSet.gitHubWeb,
+                    );
                 }
             }
 
