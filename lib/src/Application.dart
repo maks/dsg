@@ -29,7 +29,7 @@ class Application {
             _configLogging(config.loglevel);
 
             try {
-                _testPreconditions(cm);
+                _testPreconditions(cm, config);
 
             } catch(error) {
                 stderr.writeln(error.toString());
@@ -320,7 +320,12 @@ class Application {
 
     // -- private -------------------------------------------------------------
 
-    void _testPreconditions(final CommandManager cm) {
+    void _testPreconditions(final CommandManager cm, final Config config) {
+        // if not using sass or prefixer, dont check for them being available
+        if (!config.usesass && !config.useautoprefixer) {
+          return;
+        }
+
         if((cm.containsKey(CommandManager.SASS) || cm.containsKey(CommandManager.SASSC))
             && cm.containsKey(CommandManager.AUTOPREFIXER)) {
             return;
