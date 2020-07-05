@@ -14,3 +14,7 @@ packages
 .pub
 refreshChromium-1.0.applescript
 *.lockSiteGen.iml
+
+# Files and directories created by pub
+.dart_tool/
+.packages
