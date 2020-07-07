@@ -308,7 +308,7 @@ class Generator {
         Validate.notEmpty(content);
 
         final String startsWithString = _startStringForYamlBlock(delimiter,forExtension);
-        final String endsWithString = delimiter.substring(delimiter.length - 2, delimiter.length - 1);
+        final String endsWithString = delimiter;
 
         bool hasYamlBlock = content.any( (line) => line.startsWith(startsWithString) && line.endsWith(endsWithString));
         return hasYamlBlock;
@@ -320,7 +320,7 @@ class Generator {
         Validate.notBlank(forExtension);
 
         final String yamlStartBlock = _startStringForYamlBlock(delimiter,forExtension);
-        final List<String> lines = content.takeWhile( (line) => !line.startsWith(yamlStartBlock)).toList();
+        final List<String> lines = content.skip(1).takeWhile( (line) => !line.startsWith(yamlStartBlock)).toList();
         final List<String> yamlBlock = new List<String>();
 
         switch(forExtension) {

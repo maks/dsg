@@ -211,6 +211,7 @@ Supported vars:
 **SiteGen** lets you use [markdown](http://daringfireball.net/projects/markdown/syntax) to write your site content. At the beginning of each markdown file, you
 have the option to use a [YAML](http://rhnh.net/2011/01/31/yaml-tutorial) block to define custom values that you can inject into your templates. Example:
 
+    ~~~
     title: A Blog Post
     published: 01/01/2014
     category: example
@@ -218,11 +219,11 @@ have the option to use a [YAML](http://rhnh.net/2011/01/31/yaml-tutorial) block 
         - StillShot
         - Rants
         - Etc.
-    ~~~~~~
+    ~~~
     {{title}}
     Normal Markdown content here...
 
-As you can see, a line of tildes (`~`) is used to designate your YAML block. You can access/inject your values into
+As you can see, a line of tildes (`~`) is used to delimit your YAML block (marking start and end lines). You can access/inject your values into
 your pages using [mustache template syntax](http://mustache.github.io/mustache.5.html). You can do this either inside your dedicated HTML/mustache templates:
 
     <ul>
@@ -272,6 +273,7 @@ A partial can be either a .md or a .html file
 
 You can also use partials in the files yaml block:
 ```yaml
+~~~
 template: default.html    
 dart: ->usage.badge.dart  
 ~~~  
