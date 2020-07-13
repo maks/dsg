@@ -1,6 +1,11 @@
 # Change Log for dsg
 Static site generator for Dart, webserver included.
 
+## [v1.0.2](http://github.com/maks/dsg/compare/v1.0.1...v1.0.2) - 2020-07-13
+
+### Docs
+* removed dart file from sample [65116af](https://github.com/maks/dsg/commit/65116afaea1a9d8a8c6ccca3a091b486746881e5)
+
 ## [v1.0.1](http://github.com/maks/dsg/compare/v1.0.0...v1.0.1) - 2020-07-13
 
 ### Fixes
