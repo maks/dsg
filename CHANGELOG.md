@@ -1,6 +1,11 @@
 # Change Log for dsg
 Static site generator for Dart, webserver included.
 
+## [v1.0.1](http://github.com/maks/dsg/compare/v1.0.0...v1.0.1) - 2020-07-13
+
+### Fixes
+* naming lints for pub.dev [e52e617](https://github.com/maks/dsg/commit/e52e617eeb104e56ade8395a27fbf0c4945abf9f)
+
 ## [v1.0.0](http://github.com/maks/dsg/compare/v0.0.1...v1.0.0) - 2020-07-13
 
 ### Feature

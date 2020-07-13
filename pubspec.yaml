@@ -2,7 +2,7 @@ name: dsg
 description: Static site generator for Dart, webserver included.
 homepage: https://github.com/maks/dsg
 
-version: 1.0.0
+version: 1.0.1
 
 environment:
   sdk: ">=2.8.0 <3.0.0"
