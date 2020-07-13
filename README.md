@@ -1,4 +1,4 @@
-# DSG: A Dart Site Generator 
+# DSG: A Dart Static Site Generator 
 
 Includes support for:
 * commonmark (markdown) content 
