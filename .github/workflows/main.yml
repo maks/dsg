@@ -21,7 +21,7 @@ jobs:
       - uses: actions/checkout@v1
       - uses: DanTup/gh-actions/setup-dart@master
       - run: mkdir -p build
-      - run: /usr/lib/dart/bin/pub get
+      - run: pub get
       - run: dart2native bin/dsg.dart -v -o build/${{ matrix.output-name }}
       - uses: actions/upload-artifact@v1
         with:
