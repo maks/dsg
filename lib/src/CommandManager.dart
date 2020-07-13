@@ -1,4 +1,4 @@
-part of sitegen;
+part of dsg;
 
 class CommandManager {
     static String SASS = "sass";

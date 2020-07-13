@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:sitegen/sitegen.dart';
+
+import 'package:dsg/dsg.dart';
 
 Future main(List<String> arguments) async {
     final Application application = new Application();

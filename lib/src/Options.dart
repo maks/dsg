@@ -1,8 +1,8 @@
-part of sitegen;
+part of dsg;
 
 /// Commandline options
 class Options {
-    static const APPNAME                    = 'sitegen';
+    static const APPNAME                    = 'dsg';
 
     static const _ARG_HELP                  = 'help';
     static const _ARG_LOGLEVEL              = 'loglevel';

@@ -1,16 +1,21 @@
-# SiteGen 
-> Static site generator. Includes a webserver, sass + autoprefix support  
-> Wants to be Jekyll for Dart 
+# DSG: A Dart Site Generator 
 
-Before you read on - check out this [video](https://www.youtube.com/watch?v=smf1uvy0yNQ):
+Includes support for:
+* commonmark (markdown) content 
+* mustache templates
+* template partials
+* yaml front-matter
+* json / yaml data processing
+* a webserver
+* Sass + autoprefix support  
 
-[![ScreenShot](https://github.com/MikeMitterer/dart-sitegen/blob/master/assets/screenshot.jpg?raw=true)](https://www.youtube.com/watch?v=smf1uvy0yNQ)
+*think: Jekyll for Dart*
 
 ## Example
 
-   - Install SiteGen `pub global activate sitegen`
-   - Clone the example from `https://github.com/MikeMitterer/dart-sitegen/tree/master/samples/simple`
-   - run `sitegen -w` 
+   - Install DSG `pub global activate dsg`
+   - Clone the example from `https://github.com/maks/dsg/tree/master/samples/simple`
+   - run `dsg -w` 
    - open another console window and run `pub run build_runner serve --delete-conflicting-outputs --live-reload`
 
 Play with the sample files...
@@ -19,15 +24,15 @@ Play with the sample files...
 This is absolutely mandatory if your REST-Server
 uses [HTTP Strict Transport Security (HSTS)](https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security)
 
-[Here](https://github.com/MikeMitterer/dart-sitegen/blob/master/samples/simple/.sitegen/site.yaml) 
+[Here](https://github.com/maks/dsg/blob/master/samples/simple/.sitegen/site.yaml) 
 you can see the necessary configuration for HTTPS-Support   
 Generate a self-signed certificate, name it dart.cert and dart.key, place it under <project root>/etc 
-and run `sitegen -x --usesec` and - voila. That's it!
+and run `dsg -x --usesec` and - voila. That's it!
 
 #### Support for SASS_PATH
 [Understanding and Using Sass Load Paths](http://technology.customink.com/blog/2014/10/09/understanding-and-using-sass-load-paths/)   
 
-These settings in your .sitegen/site.yaml ()
+These settings in your .dsg/site.yaml ()
 ```yaml
     sasscompiler: sass
     sass_path:
@@ -37,13 +42,13 @@ These settings in your .sitegen/site.yaml ()
 
 generate generate the following SASS_PATH:
 ```bash
-sitegen -s
+dsg -s
 
     Settings:
         Loglevel:                  info
         ...
         SASS compiler:             sass
-        SASS_PATH (only for sass): /Users/mikemitterer/.pub-cache/hosted/pub.dartlang.org/zengen-0.3.2/lib
+        SASS_PATH (only for sass): /Users/example/.pub-cache/hosted/pub.dartlang.org/zengen-0.3.2/lib
                                    /Volumes/Daten/DevLocal/DevDart/MaterialDesignLite/lib
         ...
 
@@ -58,24 +63,22 @@ Now you can define your SASS-Import as follows:
 ```
 
 ### What it does
-SiteGen is a static site generator in [Dart](https://www.dartlang.org/), webserver included.
+DSG is a static site generator in [Dart](https://www.dartlang.org/), webserver included.
 With extra assets-folder and partials-support.  
-You can write your pages in HTML or [Markdown](http://daringfireball.net/projects/markdown/syntax). 
-For Templates [Mustache](http://mustache.github.io/mustache.5.html) is supported.
+You can write your pages in HTML or [CommonMark aka "Markdown"](https://commonmark.org/) is supported.
   
 A webserver for a quick review is included. On Mac you also get automatic page refresh. On other 
 platforms you could try [LivePage](https://chrome.google.com/webstore/detail/livepage/pilnojpmdoofaelbinaeodfpjheijkbh) 
 chrome extension for maximum productivity.  
 
-[Here](https://github.com/MikeMitterer/dart-sitegen/tree/master/sample/simple) you can see a typical site structure.
+[Here](https://github.com/maks/dsg/tree/master/sample/simple) you can see a typical site structure.
 
-Under [sitegen.mikemitterer.at](http://sitegen.mikemitterer.at) you can see the result!   
+See [manichord.com](http://manichord.com) for a site built entirely with DSG.   
 
-Check out the [sample!](https://github.com/MikeMitterer/dart-sitegen/tree/master/samples/simple) or
-[download](https://github.com/MikeMitterer/dart-sitegen/blob/master/downloads/simple.tgz) the sample as .TGZ.
+Check out the [sample!](https://github.com/maks/dsg/tree/master/samples/simple).
 
 ```
-├── .sitegen
+├── .dsg
 │   ├── html
 │   │   ├── _content
 │   │   │   ├── about
@@ -132,11 +135,11 @@ Check out the [sample!](https://github.com/MikeMitterer/dart-sitegen/tree/master
     └── technology.html
 ```
 
-**.sitegen**: This is where your (optional) site.yaml lives  
+**.dsg**: This is where your (optional) site.yaml lives  
 This folder is also used to store autgenerated scripts - in the case above you can see
 the script to refresh Chromium on Mac.
 
-**.sitegen/html/_content**: This is where **SiteGen** will look for your files to generate the site from.
+**.dsg/html/_content**: This is where **DSG** will look for your files to generate the site from.
 The following file-formats are supported:
 
 - .md
@@ -148,13 +151,13 @@ The following file-formats are supported:
 - .scss
 - .css
 
-**.sitegen/html/_data**: [optional] This is the place where you can store your data-files.  
+**.dsg/html/_data**: [optional] This is the place where you can store your data-files.  
 The following file-formats are supported:
 
 - .yaml
 - .json
 
-**SiteGen** injects your data into a global _data variable.
+**DSG** injects your data into a global _data variable.
 Here is a sample how to use such data:
   
 ```html
@@ -165,12 +168,19 @@ Here is a sample how to use such data:
 </ul>
 ```
 
-**.sitegen/html/_assets**: [optional] Additional assets that you don't want to have in _content. For example .scss 
-or .jpg files.
+**.dsg/html/_assets**: [optional] Additional assets that you don't want to have in _content. The following file types are supported:
+* .scss 
+* .jpg
+* .png
+* .gif
+* .woff
+* .ttf
+* .pdf
 
-**.sitegen/html/_templates**: The directory containing your HTML+Mustache templates.
 
-**web**: Following Dart conventions - this is your default output directory.
+**.dsg/html/_templates**: The directory containing your HTML+Mustache templates.
+
+**web**: Following Dart conventions - this is your default **output** directory.
 
 ## site.yaml
 **Optional** [YAML](http://rhnh.net/2011/01/31/yaml-tutorial) file that stores your global values and config options.
@@ -178,7 +188,7 @@ Values set here can be accessed from all templates and markdown files.
 
 ```
 site_options:
-  author: Mike Mitterer
+  author: Maksim Lin
 ```
 
 Can be used in your template (default.html) as
@@ -186,14 +196,14 @@ Can be used in your template (default.html) as
 <span>{{_site.author}}</span>
 ```
 
-You can also use site.yaml to overwrite your **SiteGen** default configuration.  
+You can also use site.yaml to overwrite your **dsg** default configuration.  
 Supported vars:
 
-- content_dir: .sitegen/html/_content 
-- template_dir: .sitegen/html/_templates
-- data_dir: .sitegen/html/_data
-- partials_dir: .sitegen/html/_partials
-- assets_dir: .sitegen/html/_assets
+- content_dir: .dsg/html/_content 
+- template_dir: .dsg/html/_templates
+- data_dir: .dsg/html/_data
+- partials_dir: .dsg/html/_partials
+- assets_dir: .dsg/html/_assets
 - output_dir: web
 - workspace: .
 - date_format: dd.MM.yyyy
@@ -208,8 +218,10 @@ Supported vars:
 - watchfolder1, watchfolder2 and watchfolder3
 
 ## Markdown
-**SiteGen** lets you use [markdown](http://daringfireball.net/projects/markdown/syntax) to write your site content. At the beginning of each markdown file, you
-have the option to use a [YAML](http://rhnh.net/2011/01/31/yaml-tutorial) block to define custom values that you can inject into your templates. Example:
+**DSG** lets you use [CommonMark aka "Markdown"](https://commonmark.org/) to write your site content.
+
+At the beginning of each markdown file, you
+have the option to use a [YAML](http://rhnh.net/2011/01/31/yaml-tutorial) "front-matter" block to define custom values that you can inject into your templates. Example:
 
     ~~~
     title: A Blog Post
@@ -240,7 +252,7 @@ Or, you can embed your values within the markdown file itself:
 
 so you can take advantage of templating and markdown at the same time.
 
-Simply place all your files in your `content_dir` and **SiteGen** will generate your site accordingly.      
+Simply place all your files in your `content_dir` and **DSG** will generate your site accordingly.      
 If your markdown file has a .md extension it will be renamed to .html.
     
 ## Templates
@@ -280,7 +292,7 @@ dart: ->usage.badge.dart
 ```
 
 ## SASS
-If SiteGen finds a .scss file in your output dir (web) it compiles it to the corresponding .css file.      
+If DSG finds a .scss file in your output dir (web) it compiles it to the corresponding .css file.      
 Install instruction for SASS can be found [here](http://sass-lang.com/install)  
 In short it's `gem install sass` and `gem install sassc`  
 
@@ -289,7 +301,7 @@ You can turn off SASS either with `--no-usesass` or with the appropriate setting
 Or - event better, **install sassc**: `brew install sassc`
 
 ## Autoprefixer
-After compiling .SCSS to .CSS SiteGen calls autoprefixer <yourcss>  
+After compiling .SCSS to .CSS DSG calls autoprefixer <yourcss>  
 Install autoprefixer with `npm install --global autoprefixer-cli`
 
 You can turn off Autoprefixer either with `--no-useapfx` or with the appropriate setting in site.yaml 
@@ -297,23 +309,23 @@ You can turn off Autoprefixer either with `--no-useapfx` or with the appropriate
 # Install
 Install
 ```shell
-    pub global activate sitegen
+    pub global activate dsg
 ```
 
 Update
 ```shell
-    # activate sitegen again
-    pub global activate sitegen
+    # activate dsg again
+    pub global activate dsg
 ```
 
 Uninstall
 ```shell
-    pub global deactivate sitegen   
+    pub global deactivate dsg   
 ```    
     
 ## Usage    
 ```shell
-Usage: sitegen [options]
+Usage: dsg [options]
     -s, --settings         Prints settings
     -h, --help             Shows this message
     -g, --generate         Generate site
@@ -347,21 +359,21 @@ Usage: sitegen [options]
 
 Sample:
 
-    'Generates all basic files and folders:                'sitegen -i'
-    'Observes the default dirs and serves the web-folder:  'sitegen -w --serve'
-    'Observes the default dirs and serves the web-folder:  'sitegen -x'
-    'Generates the static site in your 'web-folder':       'sitegen -g'
+    'Generates all basic files and folders:                'dsg -i'
+    'Observes the default dirs and serves the web-folder:  'dsg -w --serve'
+    'Observes the default dirs and serves the web-folder:  'dsg -x'
+    'Generates the static site in your 'web-folder':       'dsg -g'
 ```
 
 Go to your project root (this is where your pubspec.yaml is) and type:
 
-    sitegen -i
+    dsg -i
     
 This creates a basic file structure for you.     
 
 Now type
 
-    sitegen -w --serve
+    dsg -w --serve
     
 This servers your files under http://localhost:8000/    
         
@@ -369,31 +381,33 @@ If you are using Chromium on Mac you will get a automatic page refresh for free!
  
 ## Hints
 - Just serve a local dir on port 8000 without generating something:  
-    `sitegen --serve --docroot .`
+    `dsg --serve --docroot .`
     
-- Sitegen observes automatically it's basefolders like content, web aso. but if
-    you want additional folders that should be observed so that sitegen automatically regenerates it's
+- DSG observes automatically it's basefolders like content, web aso. but if
+    you want additional folders that should be observed so that dsg automatically regenerates it's
     file - set watchfolder[1-3] in you site.yaml
     
-- Test your App with Chrome and use sitegen as server (MAC + Linux only)  
-    `pub build && cd build/web && sitegen --serve --port 9000 --docroot . || cd -`
+- Test your App with Chrome and use dsg as server (MAC + Linux only)  
+    `pub build && cd build/web && dsg --serve --port 9000 --docroot . || cd -`
     
     *Explanation:*  
     Runs "pub build" - if this runs without errors cd to "build/web"
-    In "build/web" run sitegen as server on port 9000 and set docroot to . (current dir (default would be "web"))  
-    || means if the prev command ends with an error (Ctrl + C to cancel sitegen)   
+    In "build/web" run dsg as server on port 9000 and set docroot to . (current dir (default would be "web"))  
+    || means if the prev command ends with an error (Ctrl + C to cancel dsg)   
     jump back where you came from. You should be back in your base folder (where your pubspec.yaml is)
     
  
 
 ### Features and bugs
-Please file feature requests and bugs at the [issue tracker](https://github.com/MikeMitterer/dart-sitegen/issues).
+Please file feature requests and bugs at the [issue tracker](https://github.com/maks/dsg/issues).
 
 ### Thanks
-I want to thank "Enrique Gavidia" for his [stillshot](https://pub.dartlang.org/packages/stillshot) 
-package that I used as basis for **SiteGen**. 
+I want to thank **Michael Mitterer** for his [SiteGen](https://github.com/MikeMitterer/dart-sitegen) 
+package that I used as a starting point for **DSG**. 
 
 ### License
+
+    Copyright 2020 Maksim Lin (admin@manichord.com), Manichord Pty Ltd
 
     Copyright 2019 Michael Mitterer (office@mikemitterer.at),
     IT-Consulting and Development Limited, Austrian Branch
@@ -409,7 +423,3 @@ package that I used as basis for **SiteGen**.
     "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
     either express or implied. See the License for the specific language
     governing permissions and limitations under the License.
-
-
-If this plugin is helpful for you - please [(Circle)](http://gplus.mikemitterer.at/) me
-or **star** this repo here on GitHub.

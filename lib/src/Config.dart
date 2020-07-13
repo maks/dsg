@@ -1,13 +1,13 @@
-part of sitegen;
+part of dsg;
 
 /**
  * Defines default-configurations.
  * Most of these configs can be overwritten by commandline args.
  */
 class Config {
-    final Logger _logger = new Logger("sitegen.Config");
+    final Logger _logger = new Logger("dsg.Config");
 
-    static const String _CONFIG_FOLDER     = ".sitegen";
+    static const String _CONFIG_FOLDER     = ".dsg";
 
     static const _CONF_CONTENT_DIR              = 'content_dir';
     static const _CONF_TEMPLATE_DIR             = 'template_dir';
@@ -303,7 +303,7 @@ class Config {
             }
         });
     }
-    /// Interprets the "sass_path" settings in .sitegen/site.yaml
+    /// Interprets the "sass_path" settings in site.yaml
     String get _sasspath {
         // Can be a String or a YamlList
         final pathInSettings = _settings[Config._CONF_SASS_PATH];

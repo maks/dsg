@@ -1,4 +1,4 @@
-library sitegen;
+library dsg;
 
 import 'dart:io';
 import 'dart:async';
@@ -24,13 +24,13 @@ import 'package:http_server/http_server.dart';
 import 'package:system_info/system_info.dart';
 import 'package:packages/packages.dart';
 
-part "src/Application.dart";
-part "src/CommandManager.dart";
-part "src/Options.dart";
-part "src/Config.dart";
-part "src/Init.dart";
+part 'src/Application.dart';
+part 'src/CommandManager.dart';
+part 'src/Options.dart';
+part 'src/Config.dart';
+part 'src/Init.dart';
 
-part "src/Generator.dart";
+part 'src/Generator.dart';
 
 bool _runsOnOSX() => (SysInfo.operatingSystemName == "Mac OS X");
 

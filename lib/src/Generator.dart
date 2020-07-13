@@ -1,4 +1,4 @@
-part of sitegen;
+part of dsg;
 
 /**
  * Takes a template string (such as a Mustache template) and renders it out to an HTML string
@@ -23,7 +23,7 @@ TemplateRenderer renderTemplate = (final String source,final Map options, final 
 };
 
 class Generator {
-    final Logger _logger = new Logger("sitegen.Generator");
+    final Logger _logger = new Logger("dsg.Generator");
 
     /// Mustache-Renderer strips out newlines
     static const String _NEWLINE_PROTECTOR = "@@@#@@@";

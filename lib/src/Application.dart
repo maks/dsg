@@ -1,7 +1,7 @@
-part of sitegen;
+part of dsg;
 
 class Application {
-    final Logger _logger = new Logger("sitegen.Application");
+    final Logger _logger = new Logger("dsg.Application");
 
     /// Commandline options
     final Options options;

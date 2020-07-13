@@ -1,11 +1,11 @@
-part of sitegen;
+part of dsg;
 
 /**
  * Initializes your site directory.
  * This means - creates _templates folder, _content folder aso.
  */
 class Init {
-    final Logger _logger = new Logger("sitegen.Init");
+    final Logger _logger = new Logger("dsg.Init");
 
     static const String _STYLES_FOLDER = "styles";
     static const String _STYLES_FILE = "main.scss";
@@ -50,7 +50,7 @@ class Init {
 
         final File file = new File("${config.configfolder}/${config.configfile}");
         if(! await file.exists()) {
-            final String content = "site_options:\n  generator: SiteGen\n  site_name: Sample";
+            final String content = "site_options:\n  generator: DSG\n  site_name: Sample";
             await file.writeAsString(content);
             _logger.info("${file.path} created...");
         }
