@@ -1,0 +1,17 @@
+#template_dir: ../_templates
+
+# Usage: _site.<var name>
+# Sample: _site.site_name
+site_options:
+  name: Mike
+  site_name: MDL/Dart + SiteGen Sample
+  author: Mike Mitterer
+
+#browser: Chrome
+#browser: Dartium
+
+# Use secure connection
+usesec: true
+
+cert_file: etc/dart.crt
+key_file: etc/dart.key

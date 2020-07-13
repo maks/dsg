@@ -1,0 +1,44 @@
+name: sitegen
+description: Static site generator for Dart, webserver included.
+author: Mike Mitterer <office@mikemitterer.at>
+homepage: https://github.com/MikeMitterer/dart-sitegen
+
+version: 2.0.1
+
+environment:
+  sdk: ">=2.0.0 <3.0.0"
+
+# Add the bin/sitegen.dart script to the scripts pub installs.
+# Activate local repo:
+#   pub global activate --source path .
+#
+executables:
+  sitegen:
+
+dependencies:
+  logging: '>=0.11.3 <1.0.0'
+  console_log_handler: ^1.0.0
+  # path: /Volumes/Daten/DevLocal/DevDart/ConsoleLogHandler
+
+  validate: ^1.0.0
+
+  args: ^1.4.0
+  yaml: ^2.1.0
+  path: ^1.0.0
+  markdown: ^2.0.0
+  reflected_mustache: ^1.0.0
+  intl: ^0.15.0
+  http_server: ^0.9.0
+
+  system_info: ^0.1.0
+  where: ^6.0.0
+  
+  packages: ^0.4.0
+    #path: /Volumes/Daten/DevLocal/DevDart/Packages
+    
+dev_dependencies:
+  test: any
+  grinder: any
+
+  build_runner: any
+  build_test: any
