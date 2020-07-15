@@ -161,8 +161,6 @@ class Application {
         }
 
         runZoned(() {
-            //HttpServer.bindSecure(ip,int.parse(port),context)
-            //HttpServer.bind(ip, int.parse(port))
             connect.then( (final HttpServer server) {
                 _logger.info('Server running $ip on port: $port, $MY_HTTP_ROOT_PATH');
                 server.listen( (final HttpRequest request) {
@@ -186,7 +184,7 @@ class Application {
                 });
             });
         },
-        onError: (e, stackTrace) => _logger.severe('Oh noes! $e $stackTrace'));
+        onError: (e, stackTrace) => _logger.severe('Error running http server: $e $stackTrace'));
     }
 
     void watch(final String folder, final Config config) {
@@ -294,30 +292,6 @@ class Application {
         }
     }
 
-    /*
-    void watchToRefresh(final String folder, final Config config) {
-        Validate.notBlank(folder);
-        Validate.notNull(config);
-
-        _logger.fine('Observing: (watchToRefresh) $folder...');
-
-        void _schedulePageRefresh() {
-            if(timerForPageRefresh == null) {
-                timerForPageRefresh = new Timer(new Duration(milliseconds: 500), () {
-                    _refreshPage(config);
-                    timerForPageRefresh = null;
-                });
-            }
-        }
-
-        final File srcDir = new File(folder);
-        srcDir.watch(recursive: true).listen((final FileSystemEvent event) {
-            _logger.fine(event.toString());
-            _schedulePageRefresh();
-        });
-    }
-    */
-
     void _testPreconditions(final CommandManager cm, final Config config) {
         // if not using sass or prefixer, dont check for them being available
         if (!config.usesass && !config.useautoprefixer) {
@@ -364,73 +338,7 @@ class Application {
         _autoPrefixer(cssFile,config);
     }
 
-    /*
-    REMINDER!
-
-    /**
-     * Weitere Infos:
-     *      https://github.com/guard/guard-livereload
-     *      https://github.com/nitoyon/livereloadx
-     *      http://goo.gl/M1L4kf
-     *
-     *      WebSocket / ChromeExtension: http://goo.gl/unsnXc
-     */
-    Future _refreshPage(final Config config) async {
-        Validate.notNull(config);
-
-        if(!Platform.isMacOS) {
-            _logger.info("Page refresh is only supported on Mac");
-            return;
-        }
-
-        final String content = """
-                tell application "${config.browser}"
-                    set windowList to every window
-                    repeat with aWindow in windowList
-                        set tabList to every tab of aWindow
-                        repeat with atab in tabList
-                            if (URL of atab contains "localhost") then
-                                tell atab to reload
-                            end if
-                        end repeat
-                    end repeat
-                end tell
-        """;
-
-        final String version = "1.0";
-        final String executable = "osascript";
-        final String scriptName = "refresh${config.browser}";
-        final String scriptExtension = "applescript";
-
-        final Directory contenfolder = new Directory(config.configfolder);
-        if (!await contenfolder.exists()) {
-            await contenfolder.create();
-        }
-
-        final File script = new File("${contenfolder.path}/$scriptName-${version}.$scriptExtension");
-        if (!await script.exists()) {
-            contenfolder.listSync().forEach((final entity) {
-                _logger.info("Entity: ${entity.path}");
-                if (entity is File && path.basename(entity.path).startsWith(scriptName)) {
-                    final File oldScript = new File(entity.path);
-                    oldScript.delete();
-                }
-            });
-            await script.writeAsString(content.trim());
-            _logger.info("${script.path} created...");
-        }
-
-        final ProcessResult resultOsascript = await Process.run(executable, [ script.path ]);
-        if (resultOsascript.exitCode != 0) {
-            _logger.severe("$executable faild with: ${(resultOsascript.stderr as String).trim()}!");
-            _vickiSay("$executable failed",config);
-            return;
-        }
-
-        _logger.info("$executable ${script.path} successful!");
-    }
-    */
-
+   
     bool _isFolderAvailable(final String folder) {
         Validate.notBlank(folder);
         final Directory dir = new Directory(folder);
@@ -465,7 +373,7 @@ class Application {
         _logger.info("Compiling $source -> $target");
         final ProcessResult result = Process.runSync(compiler, [ source, target ], environment: environment);
         if (result.exitCode != 0) {
-            _logger.info("sassc faild with: ${(result.stderr as String).trim()}!");
+            _logger.info("sassc failed with: ${(result.stderr as String).trim()}!");
             _vickiSay("got a sassc error",config);
             return;
         }
