@@ -1,6 +1,5 @@
 name: dsg
-description: "Static site generator for Dart, with support for markdown, mustache, partials, assets, sass, 
-webserver included."
+description: "Static site generator. Supports markdown, mustache, partials, assets, sass. Webserver included."
 homepage: https://github.com/maks/dsg
 
 version: 1.0.2
