@@ -30,7 +30,7 @@ Generate a self-signed certificate, name it dart.cert and dart.key, place it und
 and run `dsg -x --usesec` and - voila. That's it!
 
 #### Support for SASS_PATH
-[Understanding and Using Sass Load Paths](http://technology.customink.com/blog/2014/10/09/understanding-and-using-sass-load-paths/)   
+[Understanding and Using Sass Load Paths](https://technology.customink.com/blog/2014/10/09/understanding-and-using-sass-load-paths/)   
 
 These settings in your .dsg/site.yaml ()
 ```yaml
@@ -73,7 +73,7 @@ chrome extension for maximum productivity.
 
 [Here](https://github.com/maks/dsg/tree/master/sample/simple) you can see a typical site structure.
 
-See [manichord.com](http://manichord.com) for a site built entirely with DSG.   
+See [manichord.com](https://manichord.com) for a site built entirely with DSG.   
 
 Check out the [sample!](https://github.com/maks/dsg/tree/master/samples/simple).
 
@@ -183,7 +183,7 @@ Here is a sample how to use such data:
 **web**: Following Dart conventions - this is your default **output** directory.
 
 ## site.yaml
-**Optional** [YAML](http://rhnh.net/2011/01/31/yaml-tutorial) file that stores your global values and config options.
+**Optional** [YAML](https://rhnh.net/2011/01/31/yaml-tutorial) file that stores your global values and config options.
 Values set here can be accessed from all templates and markdown files.
 
 ```
@@ -221,7 +221,7 @@ Supported vars:
 **DSG** lets you use [CommonMark aka "Markdown"](https://commonmark.org/) to write your site content.
 
 At the beginning of each markdown file, you
-have the option to use a [YAML](http://rhnh.net/2011/01/31/yaml-tutorial) "front-matter" block to define custom values that you can inject into your templates. Example:
+have the option to use a [YAML](https://rhnh.net/2011/01/31/yaml-tutorial) "front-matter" block to define custom values that you can inject into your templates. Example:
 
     ~~~
     title: A Blog Post
@@ -236,7 +236,7 @@ have the option to use a [YAML](http://rhnh.net/2011/01/31/yaml-tutorial) "front
     Normal Markdown content here...
 
 As you can see, a line of tildes (`~`) is used to delimit your YAML block (marking start and end lines). You can access/inject your values into
-your pages using [mustache template syntax](http://mustache.github.io/mustache.5.html). You can do this either inside your dedicated HTML/mustache templates:
+your pages using [mustache template syntax](https://mustache.github.io/mustache.5.html). You can do this either inside your dedicated HTML/mustache templates:
 
     <ul>
       {{#tags}}
@@ -293,7 +293,7 @@ dart: ->usage.badge.dart
 
 ## SASS
 If DSG finds a .scss file in your output dir (web) it compiles it to the corresponding .css file.      
-Install instruction for SASS can be found [here](http://sass-lang.com/install)  
+Install instruction for SASS can be found [here](https://sass-lang.com/install)  
 In short it's `gem install sass` and `gem install sassc`  
 
 You can turn off SASS either with `--no-usesass` or with the appropriate setting in site.yaml 
@@ -375,7 +375,7 @@ Now type
 
     dsg -w --serve
     
-This servers your files under http://localhost:8000/    
+This serves your files under `localhost:8000/`    
         
 If you are using Chromium on Mac you will get a automatic page refresh for free!
  
@@ -416,7 +416,7 @@ package that I used as a starting point for **DSG**.
     you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
 
-       http://www.apache.org/licenses/LICENSE-2.0
+       https://www.apache.org/licenses/LICENSE-2.0
 
     Unless required by applicable law or agreed to in writing,
     software distributed under the License is distributed on an
