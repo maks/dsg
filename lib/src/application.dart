@@ -199,14 +199,14 @@ class Application {
 
     final Directory srcDir = new Directory(folder);
 
-    srcDir
-        .watch(recursive: true)
-        .where((final file) => (!file.path.contains("packages")))
-        .listen((final FileSystemEvent event) {
+    var watcher = DirectoryWatcher(srcDir.path);
+    watcher.events
+        .where((final event) => (!event.path.contains("packages")))
+        .listen((final event) {
       _logger.info(event.toString());
       if (timerWatch == null) {
-        timerWatch = new Timer(new Duration(milliseconds: 1000), () {
-          new Generator().generate(config);
+        timerWatch = Timer(Duration(milliseconds: 1000), () {
+          Generator().generate(config);
           timerWatch = null;
         });
       }
@@ -293,6 +293,38 @@ class Application {
       _logger.info("Found no SCSS without a _ at the beginning...");
     }
   }
+
+  // void _watchDir({
+  //   Directory dir,
+  //   int events,
+  //   Function(FileSystemEvent event) whereFilter,
+  //   Function(FileSystemEvent event) listener,
+  //   bool recursive,
+  // }) async {
+  //   if (Platform.isLinux) {
+  //     final dirList = dir
+  //         .listSync(recursive: true)
+  //         .where((entity) => FileSystemEntity.isDirectorySync(entity.path));
+
+  //     for (final dir in dirList) {
+  //       print("WATCH: ${dir.path}");
+  //       dir.watch(events: events, recursive: false).listen(
+  //           (e) => print("file change: $e"),
+  //           onError: (e, stack) => print("$e $stack"));
+  //     }
+  //     // dirList.forEach((dir) {
+  //     //   print("WATCH: ${dir.path}");
+  //     //   dir.watch(events: events, recursive: false).listen(
+  //     //       (e) => print("file change: $e"),
+  //     //       onError: (e, stack) => print("$e $stack"));
+  //     // });
+  //   } else {
+  //     dir
+  //         .watch(events: events, recursive: recursive)
+  //         .where(whereFilter)
+  //         .listen(listener);
+  //   }
+  // }
 
   void _testPreconditions(final CommandManager cm, final Config config) {
     // if not using sass or prefixer, dont check for them being available

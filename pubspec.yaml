@@ -32,6 +32,8 @@ dependencies:
   where: ^6.0.0
   
   packages: ^0.4.0
+
+  watcher:
     
 dev_dependencies:
   test: any
