@@ -228,7 +228,7 @@ class Application {
             scssFiles.forEach((final File file) {
                 _logger.info("Observing: (watchScss) ${file.path}");
 
-                file.watch(events: FileSystemEvent.MODIFY).listen((final FileSystemEvent event) {
+                file.watch(events: FileSystemEvent.modify).listen((final FileSystemEvent event) {
                     _logger.fine(event.toString());
                     //_logger.info("Scss: ${scssFile}, CSS: ${cssFile}");
 
@@ -274,7 +274,7 @@ class Application {
 
             _logger.info("Observing: (watchAdditionalFolderScss) ${dirToCheck.path}");
 
-            dirToCheck.watch(events: FileSystemEvent.MODIFY).listen((final FileSystemEvent event) {
+            dirToCheck.watch(events: FileSystemEvent.modify).listen((final FileSystemEvent event) {
                 _logger.fine(event.toString());
                 //_logger.info("Scss: ${scssFile}, CSS: ${cssFile}");
 
