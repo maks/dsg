@@ -5,7 +5,6 @@ class CommandManager {
     static String SASSC = "sassc";
     static String AUTOPREFIXER = "autoprefixer-cli";
     static String SAY = "say";
-    // static String OSASCRIPT = "osascript";
 
     static CommandManager _commandmanager;
 
@@ -23,15 +22,12 @@ class CommandManager {
 
     bool containsKey(final String key) => _commands.containsKey(key);
 
-    // - private -----------------------------------------------------------------------------------
-
     CommandManager._private(this._commands);
 }
 
 class Command {
     final String name;
     final String exe;
-    //final CommandWrapper wrapper;
 
     Command(this.name, this.exe);
 

@@ -32,9 +32,7 @@ class Init {
             _createScssFile(config)
         ]);
     }
-
-    //- private -----------------------------------------------------------------------------------
-
+    
     Future _createDir(final String dirname) async {
         Validate.notBlank(dirname);
 

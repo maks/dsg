@@ -24,17 +24,15 @@ import 'package:http_server/http_server.dart';
 import 'package:system_info/system_info.dart';
 import 'package:packages/packages.dart';
 
-part 'src/Application.dart';
-part 'src/CommandManager.dart';
-part 'src/Options.dart';
-part 'src/Config.dart';
-part 'src/Init.dart';
+part 'src/application.dart';
+part 'src/command_manager.dart';
+part 'src/options.dart';
+part 'src/config.dart';
+part 'src/init.dart';
 
-part 'src/Generator.dart';
+part 'src/generator.dart';
 
 bool _runsOnOSX() => (SysInfo.operatingSystemName == "Mac OS X");
-
-// final _commands = new List<CommandWrapper>();
 
 Future main(List<String> arguments) async {
   final Application application = new Application();

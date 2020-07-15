@@ -247,9 +247,7 @@ class Config {
             print("    ${(key + ':').padRight(20)} $value");
         });
     }
-
-    // -- private -------------------------------------------------------------
-
+    
     void _overwriteSettingsWithArgResults() {
         if(_argResults.wasParsed(Options._ARG_LOGLEVEL)) {
             _settings[Options._ARG_LOGLEVEL] = _argResults[Options._ARG_LOGLEVEL];

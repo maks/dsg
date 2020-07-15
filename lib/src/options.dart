@@ -49,8 +49,6 @@ class Options {
         print("");
     }
 
-    // -- private -------------------------------------------------------------
-
     static ArgParser _createParser() {
         final ArgParser parser = new ArgParser()
 

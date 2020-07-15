@@ -152,9 +152,6 @@ class Generator {
 
     }
 
-
-    // -- private -------------------------------------------------------------
-
     /**
      * If there is a reference to a partial in the yaml block the contents of the partial becomes the the
      * contents of the page-var.
