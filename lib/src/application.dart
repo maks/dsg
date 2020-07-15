@@ -318,8 +318,6 @@ class Application {
     }
     */
 
-    // -- private -------------------------------------------------------------
-
     void _testPreconditions(final CommandManager cm, final Config config) {
         // if not using sass or prefixer, dont check for them being available
         if (!config.usesass && !config.useautoprefixer) {

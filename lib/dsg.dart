@@ -34,8 +34,6 @@ part 'src/generator.dart';
 
 bool _runsOnOSX() => (SysInfo.operatingSystemName == "Mac OS X");
 
-// final _commands = new List<CommandWrapper>();
-
 Future main(List<String> arguments) async {
   final Application application = new Application();
 
