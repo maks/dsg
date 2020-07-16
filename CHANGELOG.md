@@ -1,5 +1,12 @@
 # Change Log for dsg
-Static site generator for Dart, webserver included.
+"Static site generator. Supports markdown, mustache, partials, assets, sass. Webserver included."
+
+## [v1.0.3](https://github.com/maks/dsg/compare/v1.0.2...v1.0.3) - 2020-07-16
+
+### Refactor
+* cleanup code, docs, package versions for pub.dev lint
+* remove use of new keyword [ec319cc](https://github.com/maks/dsg/commit/ec319cc8b328aabf468bfb9e3b5593370806a7d1)
+
 
 ## [v1.0.2](https://github.com/maks/dsg/compare/v1.0.1...v1.0.2) - 2020-07-13
 

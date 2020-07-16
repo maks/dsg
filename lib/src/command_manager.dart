@@ -1,10 +1,10 @@
 part of dsg;
 
 class CommandManager {
-  static String SASS = "sass";
-  static String SASSC = "sassc";
-  static String AUTOPREFIXER = "autoprefixer-cli";
-  static String SAY = "say";
+  static String SASS = 'sass';
+  static String SASSC = 'sassc';
+  static String AUTOPREFIXER = 'autoprefixer-cli';
+  static String SAY = 'say';
 
   static CommandManager _commandmanager;
 
@@ -34,8 +34,8 @@ class Command {
 
 /// Test if necessary commands are available
 Future<Map<String, Command>> _getAvailableCommands() async {
-  final Map<String, Command> commands = Map<String, Command>();
-  final List<String> names = <String>[
+  final commands = <String, Command>{};
+  final names = <String>[
     CommandManager.SASS,
     CommandManager.SASSC,
     CommandManager.AUTOPREFIXER,
@@ -45,7 +45,7 @@ Future<Map<String, Command>> _getAvailableCommands() async {
 
   await Future.forEach(names, (final String binName) async {
     try {
-      final String exe = await where(binName);
+      final exe = (await where(binName)) as String;
       commands[binName] = Command(binName, exe);
     } catch (_) {}
   });

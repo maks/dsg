@@ -1,16 +1,15 @@
 part of dsg;
 
-/**
- * Initializes your site directory.
- * This means - creates _templates folder, _content folder aso.
- */
+/// Initializes your site directory.
+/// This means - creates _templates folder, _content folder aso.
+///
 class Init {
   final Logger _logger = Logger("dsg.Init");
 
   static const String _STYLES_FOLDER = "styles";
   static const String _STYLES_FILE = "main.scss";
 
-  Future createDirs(final Config config) {
+  Future<void> createDirs(final Config config) {
     Validate.notNull(config);
     return Future.wait([
       _createDir(config.templatefolder),
@@ -22,7 +21,7 @@ class Init {
   }
 
   /// Creates files like site.yaml and adds a default Template and a default content file
-  Future createFiles(final Config config) {
+  Future<void> createFiles(final Config config) {
     Validate.notNull(config);
 
     return Future.wait([
@@ -33,35 +32,33 @@ class Init {
     ]);
   }
 
-  Future _createDir(final String dirname) async {
+  Future<void> _createDir(final String dirname) async {
     Validate.notBlank(dirname);
 
-    final Directory dir = Directory(dirname);
+    final dir = Directory(dirname);
     if (!await dir.exists()) {
       await dir.create(recursive: true);
       _logger.info("${dir.path} created...");
     }
   }
 
-  Future _createSiteYaml(final Config config) async {
+  Future<void> _createSiteYaml(final Config config) async {
     Validate.notNull(config);
 
-    final File file = File("${config.configfolder}/${config.configfile}");
+    final file = File("${config.configfolder}/${config.configfile}");
     if (!await file.exists()) {
-      final String content =
-          "site_options:\n  generator: DSG\n  site_name: Sample";
+      final content = 'site_options:\n  generator: DSG\n  site_name: Sample';
       await file.writeAsString(content);
-      _logger.info("${file.path} created...");
+      _logger.info('${file.path} created...');
     }
   }
 
-  Future _createDefaultTemplate(final Config config) async {
+  Future<void> _createDefaultTemplate(final Config config) async {
     Validate.notNull(config);
 
-    final File file =
-        File(("${config.templatefolder}/${config.defaulttemplate}"));
+    final file = File(('${config.templatefolder}/${config.defaulttemplate}'));
     if (!await file.exists()) {
-      final String content = """
+      final content = '''
                 <!DOCTYPE html>
                 <html>
                 <head>
@@ -78,21 +75,21 @@ class Init {
                 -->
                 </body>
                 </html>
-            """
+            '''
           .trim()
-          .replaceAll(RegExp(r"^\s{16}", multiLine: true),
+          .replaceAll(RegExp(r'^\s{16}', multiLine: true),
               ""); // 16 is the number of spaces for the first indention
       await file.writeAsString(content);
-      _logger.info("${file.path} created...");
+      _logger.info('${file.path} created...');
     }
   }
 
-  Future _createIndexHTML(final Config config) async {
+  Future<void> _createIndexHTML(final Config config) async {
     Validate.notNull(config);
 
-    final File file = File("${config.contentfolder}/index.html");
+    final file = File("${config.contentfolder}/index.html");
     if (!await file.exists()) {
-      final String content = """
+      final content = """
                 title: My index page
                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 <section class="main">
@@ -106,13 +103,12 @@ class Init {
     }
   }
 
-  Future _createScssFile(final Config config) async {
+  Future<void> _createScssFile(final Config config) async {
     Validate.notNull(config);
 
-    final File file =
-        File("${config.contentfolder}/$_STYLES_FOLDER/$_STYLES_FILE");
+    final file = File("${config.contentfolder}/$_STYLES_FOLDER/$_STYLES_FILE");
     if (!await file.exists()) {
-      final String content = """
+      final content = '''
                 body {
                     background-color: #eeeeee;
 
@@ -120,7 +116,7 @@ class Init {
                         background-color: red;
                     }
                 }
-                """
+                '''
           .trim()
           .replaceAll(RegExp(r"^\s{16}", multiLine: true), "");
       await file.writeAsString(content);

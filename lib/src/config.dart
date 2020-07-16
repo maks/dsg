@@ -1,9 +1,8 @@
 part of dsg;
 
-/**
- * Defines default-configurations.
- * Most of these configs can be overwritten by commandline args.
- */
+/// Defines default-configurations.
+/// Most of these configs can be overwritten by commandline args.
+///
 class Config {
   final Logger _logger = Logger("dsg.Config");
 
@@ -40,7 +39,7 @@ class Config {
   static final String _SEARCH_PATH_SEPARATOR = Platform.isWindows ? ";" : ":";
 
   final ArgResults _argResults;
-  final Map<String, dynamic> _settings = Map<String, dynamic>();
+  final Map<String, dynamic> _settings = <String, dynamic>{};
   final Packages _packages = Packages();
   final CommandManager _commandmanager;
 
@@ -96,62 +95,67 @@ class Config {
 
   String get configfile => "site.yaml";
 
-  String get loglevel => _settings[Options._ARG_LOGLEVEL];
+  String get loglevel => _settings[Options._ARG_LOGLEVEL] as String;
 
-  String get contentfolder => _settings[Config._CONF_CONTENT_DIR];
+  String get contentfolder => _settings[Config._CONF_CONTENT_DIR] as String;
 
-  String get templatefolder => _settings[Config._CONF_TEMPLATE_DIR];
+  String get templatefolder => _settings[Config._CONF_TEMPLATE_DIR] as String;
 
-  String get outputfolder => _settings[Config._CONF_OUTPUT_DIR];
+  String get outputfolder => _settings[Config._CONF_OUTPUT_DIR] as String;
 
-  String get datafolder => _settings[Config._CONF_DATA_DIR];
+  String get datafolder => _settings[Config._CONF_DATA_DIR] as String;
 
-  String get partialsfolder => _settings[Config._CONF_PARTIALS_DIR];
+  String get partialsfolder => _settings[Config._CONF_PARTIALS_DIR] as String;
 
-  String get assetsfolder => _settings[Config._CONF_ASSETS_DIR];
+  String get assetsfolder => _settings[Config._CONF_ASSETS_DIR] as String;
 
-  String get workspace => _settings[Config._CONF_WORKSPACE_DIR];
+  String get workspace => _settings[Config._CONF_WORKSPACE_DIR] as String;
 
-  String get dateformat => _settings[Config._CONF_DATE_FORMAT];
+  String get dateformat => _settings[Config._CONF_DATE_FORMAT] as String;
 
-  String get yamldelimeter => _settings[Config._CONF_YAML_DELIMITER];
+  String get yamldelimeter => _settings[Config._CONF_YAML_DELIMITER] as String;
 
-  bool get usemarkdown => _settings[Config._CONF_USE_MARKDOWN];
+  bool get usemarkdown => _settings[Config._CONF_USE_MARKDOWN] as bool;
 
-  String get defaulttemplate => _settings[Config._CONF_DEFAULT_TEMPLATE];
+  String get defaulttemplate =>
+      _settings[Config._CONF_DEFAULT_TEMPLATE] as String;
 
-  String get sasscompiler => _settings[Config._CONF_SASS_COMPILER];
+  String get sasscompiler => _settings[Config._CONF_SASS_COMPILER] as String;
 
   String get sasspath => _sasspath;
 
   Map<String, String> get siteoptions =>
       _toMap(_settings[Config._CONF_SITE_OPTIONS]);
 
-  String get ip => _settings[Options._ARG_IP];
+  String get ip => _settings[Options._ARG_IP] as String;
 
   String get port => _settings[Config._CONF_PORT].toString();
 
-  String get docroot => _settings[Options._ARG_DOCROOT];
+  String get docroot => _settings[Options._ARG_DOCROOT] as String;
 
-  bool get usesass => _settings[Config._CONF_USE_SASS];
+  bool get usesass => _settings[Config._CONF_USE_SASS] as bool;
 
-  bool get useautoprefixer => _settings[Config._CONF_USE_AUTOPREFIXER];
+  bool get useautoprefixer => _settings[Config._CONF_USE_AUTOPREFIXER] as bool;
 
-  bool get usesecureconnection => _settings[Config._CONF_USE_SECURE_CONNECTION];
+  bool get usesecureconnection =>
+      _settings[Config._CONF_USE_SECURE_CONNECTION] as bool;
 
-  String get certfile => _settings[Config._CONF_CERT_FILE];
-  String get keyfile => _settings[Config._CONF_KEY_FILE];
+  String get certfile => _settings[Config._CONF_CERT_FILE] as String;
+  String get keyfile => _settings[Config._CONF_KEY_FILE] as String;
 
-  bool get talktome => _settings[Config._CONF_TALK_TO_ME];
+  bool get talktome => _settings[Config._CONF_TALK_TO_ME] as bool;
 
-  String get browser => _settings[Config._CONF_BROWSER];
+  String get browser => _settings[Config._CONF_BROWSER] as String;
 
-  String get watchfolder1 => _settings[Config._CONF_ADDITIONAL_WATCH_FOLDER1];
-  String get watchfolder2 => _settings[Config._CONF_ADDITIONAL_WATCH_FOLDER2];
-  String get watchfolder3 => _settings[Config._CONF_ADDITIONAL_WATCH_FOLDER3];
+  String get watchfolder1 =>
+      _settings[Config._CONF_ADDITIONAL_WATCH_FOLDER1] as String;
+  String get watchfolder2 =>
+      _settings[Config._CONF_ADDITIONAL_WATCH_FOLDER2] as String;
+  String get watchfolder3 =>
+      _settings[Config._CONF_ADDITIONAL_WATCH_FOLDER3] as String;
 
   Map<String, String> get settings {
-    final Map<String, String> settings = Map<String, String>();
+    final settings = <String, String>{};
 
     settings["loglevel"] = loglevel;
 
@@ -199,7 +203,7 @@ class Config {
     settings["Additional watchfolder3"] =
         watchfolder1.isNotEmpty ? watchfolder3 : "<not set>";
 
-    if (dirstoscan.length > 0) {
+    if (dirstoscan.isNotEmpty) {
       settings["Dirs to scan"] = dirstoscan.join(", ");
     }
 
@@ -208,16 +212,16 @@ class Config {
 
   void printSettings() {
     int getMaxKeyLength() {
-      int length = 0;
+      var length = 0;
       settings.keys
           .forEach((final String key) => length = max(length, key.length));
       return length;
     }
 
-    final int maxKeyLength = getMaxKeyLength();
+    final maxKeyLength = getMaxKeyLength();
 
     String prepareKey(final String key) {
-      if (!key.isEmpty) {
+      if (key.isNotEmpty) {
         return "${key[0].toUpperCase()}${key.substring(1)}:"
             .padRight(maxKeyLength + 1);
       } else {
@@ -230,7 +234,7 @@ class Config {
     //print("    ${'Name'.padRight(maxKeyLeght)}  ${'Value'.padRight(25)} ${'Key (site.yaml)'}");
     settings.forEach((final String key, final value) {
       if (key.toLowerCase().startsWith("sass_path") && sasspath.isNotEmpty) {
-        final List<String> segments = value.split(_SEARCH_PATH_SEPARATOR);
+        final segments = value.split(_SEARCH_PATH_SEPARATOR);
         print("    ${prepareKey(key)} ${segments.first}");
         segments.skip(1).forEach((final String path) {
           print("    ${prepareKey('')} $path");
@@ -295,11 +299,11 @@ class Config {
   }
 
   void _overwriteSettingsWithConfigFile() {
-    final File file = File("${configfolder}/${configfile}");
+    final file = File("${configfolder}/${configfile}");
     if (!file.existsSync()) {
       return;
     }
-    final yaml.YamlMap map = yaml.loadYaml(file.readAsStringSync());
+    final map = yaml.loadYaml(file.readAsStringSync()) as yaml.YamlMap;
     _settings.keys.forEach((final String key) {
       if (map != null && map.containsKey(key)) {
         _settings[key] = map[key];
@@ -311,34 +315,32 @@ class Config {
   /// Interprets the "sass_path" settings in site.yaml
   String get _sasspath {
     // Can be a String or a YamlList
-    final pathInSettings = _settings[Config._CONF_SASS_PATH];
+    final dynamic pathInSettings = _settings[Config._CONF_SASS_PATH];
 
     // Nothing to do here - return an empty string
-    if (pathInSettings.isEmpty) {
-      return pathInSettings;
+    if (pathInSettings.isEmpty == true) {
+      return '';
     }
 
-    final List<String> tempPathList = List<String>();
+    final tempPathList = <String>[];
     if (pathInSettings is String) {
       // Config-Path can be separated by a |
       tempPathList.addAll(pathInSettings.split("|"));
     } else if (pathInSettings is yaml.YamlList) {
-      pathInSettings
-          .toList()
-          .forEach((final element) => tempPathList.add(element.toString()));
+      pathInSettings.toList().forEach(
+          (final dynamic element) => tempPathList.add(element.toString()));
     } else {
       _logger.warning(
           "sass_path must be either a String or a YamlList but was ${pathInSettings.runtimeType}...");
     }
 
-    final List<String> sasspath = List<String>();
+    final sasspath = <String>[];
     tempPathList.forEach((final String pathEntry) {
       if (pathEntry.startsWith("package:")) {
-        final Uri uri = Uri.parse(pathEntry);
+        final uri = Uri.parse(pathEntry);
         try {
-          final Package package = _packages.resolvePackageUri(uri);
-          final String packageUri =
-              package.uri.toString().replaceFirst("file://", "");
+          final package = _packages.resolvePackageUri(uri);
+          final packageUri = package.uri.toString().replaceFirst("file://", "");
           sasspath.add(path.normalize(path.absolute(packageUri)));
         } catch (error) {
           _logger.shout(error.toString());
@@ -355,16 +357,16 @@ class Config {
     return sasspath.join(_SEARCH_PATH_SEPARATOR);
   }
 
-  Map<String, String> _toMap(final configOption) {
+  Map<String, String> _toMap(final dynamic configOption) {
     if (configOption is Map<String, String>) {
       return configOption;
     }
 
     if (configOption is yaml.YamlMap) {
-      return configOption.map((key, value) =>
+      return configOption.map((dynamic key, dynamic value) =>
           MapEntry<String, String>(key.toString(), value.toString()));
     } else {
-      return configOption;
+      return configOption as Map<String, String>;
     }
   }
 }

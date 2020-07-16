@@ -8,22 +8,22 @@ class Application {
 
   /// {timerForPageRefresh} waits 500ms before refreshing the page
   /// If there are more PageRefresh-Requests withing 500ms only the last refresh will be made
-  Timer timerForPageRefresh = null;
+  Timer timerForPageRefresh;
 
   /// {timerWatchCss} waits 500ms before it calls it's watch-functions.
   /// If there are more watch-events within 500ms only the last event counts
-  Timer timerWatchCss = null;
+  Timer timerWatchCss;
 
   /// {timerWatch} waits 500ms until all watched folders and files updated
-  Timer timerWatch = null;
+  Timer timerWatch;
 
   Application() : options = Options();
 
-  Future run(final List<String> args) async {
+  Future<int> run(final List<String> args) async {
     try {
-      final CommandManager cm = await CommandManager.getInstance();
-      final ArgResults argResults = options.parse(args);
-      final Config config = Config(argResults, cm);
+      final cm = await CommandManager.getInstance();
+      final argResults = options.parse(args);
+      final config = Config(argResults, cm);
 
       _configLogging(config.loglevel);
 
@@ -35,7 +35,7 @@ class Application {
       }
 
       if (argResults.wasParsed(Options._ARG_HELP) ||
-          (config.dirstoscan.length == 0 && args.length == 0)) {
+          (config.dirstoscan.isEmpty && args.isEmpty)) {
         options.showUsage();
         return 0;
       }
@@ -50,12 +50,13 @@ class Application {
         return 0;
       }
 
-      bool foundOptionToWorkWith = false;
+      var foundOptionToWorkWith = false;
 
       if (argResults.wasParsed(Options._ARG_INIT)) {
         foundOptionToWorkWith = true;
-        final Init init = Init();
-        init.createDirs(config).then((_) => init.createFiles(config));
+        final init = Init();
+        await init.createDirs(config);
+        await init.createFiles(config);
         return 0;
       }
 
@@ -126,15 +127,15 @@ class Application {
     Validate.notBlank(config.docroot);
     Validate.notBlank(config.port);
 
-    final String ip = config.ip;
-    final String port = config.port;
-    final String MY_HTTP_ROOT_PATH =
+    final ip = config.ip;
+    final port = config.port;
+    final MY_HTTP_ROOT_PATH =
         config.docroot; //Platform.script.resolve(folder).toFilePath();
 
     VirtualDirectory virtDir;
     void _directoryHandler(final Directory dir, final HttpRequest request) {
       _logger.info(dir);
-      var indexUri = Uri.file(dir.path).resolve('index.html');
+      final indexUri = Uri.file(dir.path).resolve('index.html');
       virtDir.serveFile(File(indexUri.toFilePath()), request);
     }
 
@@ -144,14 +145,14 @@ class Application {
       ..jailRoot = false;
     virtDir.directoryHandler = _directoryHandler;
 
-    final Packages packages = Packages();
+    final packages = Packages();
 
     // if hasPackages is false then we are not in a Dart-Project
-    final bool hasPackages = packages.hasPackages;
+    final hasPackages = packages.hasPackages;
 
     Future<HttpServer> connect;
     if (config.usesecureconnection) {
-      final SecurityContext context = SecurityContext();
+      final context = SecurityContext();
       context.useCertificateChain(config.certfile);
       context.usePrivateKey(config.keyfile);
       connect = HttpServer.bindSecure(ip, int.parse(port), context);
@@ -162,18 +163,17 @@ class Application {
     }
 
     runZoned(() {
-      connect.then((final HttpServer server) {
+      connect.then((final server) {
         _logger.info('Server running $ip on port: $port, $MY_HTTP_ROOT_PATH');
-        server.listen((final HttpRequest request) {
+        server.listen((final request) {
           if (request.uri.path.startsWith("/packages") && hasPackages) {
-            final List<String> parts =
-                request.uri.path.split(RegExp(r"(?:/|\\)"));
-            final String path = parts.sublist(3).join("/");
-            final String packageName = parts[2];
+            final parts = request.uri.path.split(RegExp(r"(?:/|\\)"));
+            final path = parts.sublist(3).join("/");
+            final packageName = parts[2];
 
-            final Package package =
+            final package =
                 packages.resolvePackageUri(Uri.parse("package:${packageName}"));
-            final String rewritten = "${package.lib.path}/$path"
+            final rewritten = "${package.lib.path}/$path"
                 .replaceFirst(RegExp(r"^.*pub\.dartlang\.org/"), "package:");
 
             _logger.info(
@@ -187,7 +187,7 @@ class Application {
         });
       });
     },
-        onError: (e, stackTrace) =>
+        onError: (Object e, StackTrace stackTrace) =>
             _logger.severe('Error running http server: $e $stackTrace'));
   }
 
@@ -197,19 +197,17 @@ class Application {
 
     _logger.info('Observing (watch) $folder...');
 
-    final Directory srcDir = Directory(folder);
+    final srcDir = Directory(folder);
 
-    var watcher = DirectoryWatcher(srcDir.path);
+    final watcher = DirectoryWatcher(srcDir.path);
     watcher.events
         .where((final event) => (!event.path.contains("packages")))
         .listen((final event) {
       _logger.info(event.toString());
-      if (timerWatch == null) {
-        timerWatch = Timer(Duration(milliseconds: 1000), () {
-          Generator().generate(config);
-          timerWatch = null;
-        });
-      }
+      timerWatch ??= Timer(Duration(milliseconds: 1000), () {
+        Generator().generate(config);
+        timerWatch = null;
+      });
     });
   }
 
@@ -218,10 +216,10 @@ class Application {
     Validate.notNull(config);
 
     _logger.fine('Observing $folder (SCSS)... ');
-    final Directory dir = Directory(folder);
-    final List<File> scssFiles = _listSCSSFilesIn(dir);
+    final dir = Directory(folder);
+    final scssFiles = _listSCSSFilesIn(dir);
 
-    if (scssFiles.length == 0) {
+    if (scssFiles.isEmpty) {
       _logger.info("No SCSS files found");
       return;
     }
@@ -238,12 +236,10 @@ class Application {
           _logger.fine(event.toString());
           //_logger.info("Scss: ${scssFile}, CSS: ${cssFile}");
 
-          if (timerWatchCss == null) {
-            timerWatchCss = Timer(Duration(milliseconds: 500), () {
-              _compileSCSSFile(folder, config);
-              timerWatchCss = null;
-            });
-          }
+          timerWatchCss ??= Timer(Duration(milliseconds: 500), () {
+            _compileSCSSFile(folder, config);
+            timerWatchCss = null;
+          });
         });
       });
     } on StateError {
@@ -262,11 +258,11 @@ class Application {
 
     _logger.fine('Observing $cssFolder (SCSS)... ');
 
-    final Directory dirToCheck = Directory(additionalWatchFolder);
-    final Directory dir = Directory(cssFolder);
-    final List<File> scssFiles = _listSCSSFilesIn(dir);
+    final dirToCheck = Directory(additionalWatchFolder);
+    final dir = Directory(cssFolder);
+    final scssFiles = _listSCSSFilesIn(dir);
 
-    if (scssFiles.length == 0) {
+    if (scssFiles.isEmpty) {
       _logger.info("No SCSS files found");
       return;
     }
@@ -282,12 +278,10 @@ class Application {
         _logger.fine(event.toString());
         // _logger.info("Scss: ${scssFile}, CSS: ${cssFile}");
 
-        if (timerWatchCss == null) {
-          timerWatchCss = Timer(Duration(milliseconds: 500), () {
-            _compileSCSSFile(cssFolder, config);
-            timerWatchCss = null;
-          });
-        }
+        timerWatchCss ??= Timer(Duration(milliseconds: 500), () {
+          _compileSCSSFile(cssFolder, config);
+          timerWatchCss = null;
+        });
       });
     } on StateError {
       _logger.info("Found no SCSS without a _ at the beginning...");
@@ -346,27 +340,27 @@ class Application {
     Validate.notNull(config);
 
     _logger.fine('Observing: (_compileSCSSFile) $folder (SCSS)... ');
-    final Directory dir = Directory(folder);
-    final List<File> scssFiles = _listSCSSFilesIn(dir);
+    final dir = Directory(folder);
+    final scssFiles = _listSCSSFilesIn(dir);
 
-    if (scssFiles.length == 0) {
+    if (scssFiles.isEmpty) {
       _logger.info("No SCSS files found");
       return;
     }
 
     // mainScssFile is the one not starting with a _ (underscore)
     File _mainScssFile(final List<File> scssFiles) {
-      final File mainScss = scssFiles.firstWhere((final File file) {
-        final String pureFilename = path.basename(file.path);
+      final mainScss = scssFiles.firstWhere((final File file) {
+        final pureFilename = path.basename(file.path);
         return pureFilename.startsWith(RegExp(r"[a-z]", caseSensitive: false));
       });
       return mainScss;
     }
 
-    final File mainScss = _mainScssFile(scssFiles);
+    final mainScss = _mainScssFile(scssFiles);
 
-    final String scssFile = mainScss.path;
-    final String cssFile = "${path.withoutExtension(scssFile)}.css";
+    final scssFile = mainScss.path;
+    final cssFile = "${path.withoutExtension(scssFile)}.css";
 
     _logger.info("Main SCSS: $scssFile");
     _compileScss(scssFile, cssFile, config);
@@ -375,7 +369,7 @@ class Application {
 
   bool _isFolderAvailable(final String folder) {
     Validate.notBlank(folder);
-    final Directory dir = Directory(folder);
+    final dir = Directory(folder);
     return dir.existsSync();
   }
 
@@ -391,8 +385,8 @@ class Application {
       return;
     }
 
-    final String compiler = config.sasscompiler;
-    final Map<String, String> environment = Map<String, String>();
+    final compiler = config.sasscompiler;
+    final environment = <String, String>{};
 
     if (config.sasspath.isNotEmpty) {
       // only sass supports SASS_PATH (not sassc)
@@ -405,7 +399,7 @@ class Application {
     }
 
     _logger.info("Compiling $source -> $target");
-    final ProcessResult result =
+    final result =
         Process.runSync(compiler, [source, target], environment: environment);
     if (result.exitCode != 0) {
       _logger.info("sassc failed with: ${(result.stderr as String).trim()}!");
@@ -426,7 +420,7 @@ class Application {
     }
 
     _logger.info("Autoprefixing $cssFile");
-    final ProcessResult result = Process.runSync("autoprefixer-cli", [cssFile]);
+    final result = Process.runSync("autoprefixer-cli", [cssFile]);
     if (result.exitCode != 0) {
       _logger.info("prefixer faild with: ${(result.stderr as String).trim()}!");
       _vickiSay("got a prefixer error", config);
@@ -456,7 +450,7 @@ class Application {
       return;
     }
 
-    final ProcessResult result = Process.runSync(
+    final result = Process.runSync(
         "say", ['-r', '200', sentence.replaceFirst("wsk_", "")]);
     if (result.exitCode != 0) {
       _logger.severe("run faild with: ${(result.stderr as String).trim()}!");

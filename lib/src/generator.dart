@@ -1,24 +1,22 @@
 part of dsg;
 
-/**
- * Takes a template string (such as a Mustache template) and renders it out to an HTML string
- * using the given input values/options.
- */
-typedef String TemplateRenderer(
-    final String template, final Map options, final PartialsResolver resolver);
+/// Takes a template string (such as a Mustache template) and renders it out to an HTML string
+/// using the given input values/options.
+///
+typedef TemplateRenderer = String Function(
+    String template, Map options, PartialsResolver resolver);
 
 /// Resolved partial-names into mustache.Templates
-typedef mustache.Template PartialsResolver(final String name);
+typedef PartialsResolver = mustache.Template Function(String name);
 
-/**
- * Can be set to define a custom [rendering function](TemplateRenderer) to handle your template files
- * and use any templating language of your choice.
- *
- * Uses [Mustache templates](https://pub.dartlang.org/packages/mustache) by default.
- */
+/// Can be set to define a custom [rendering function](TemplateRenderer) to handle your template files
+/// and use any templating language of your choice.
+///
+/// Uses [Mustache templates](https://pub.dartlang.org/packages/mustache) by default.
+///
 TemplateRenderer renderTemplate =
     (final String source, final Map options, final PartialsResolver resolver) {
-  final mustache.Template template = mustache.Template(source,
+  final template = mustache.Template(source,
       htmlEscapeValues: false, partialResolver: resolver, lenient: true);
 
   return template.renderString(options);
@@ -32,14 +30,12 @@ class Generator {
 
   /// Render and output your static site (WARNING: overwrites existing HTML files in output directory).
   void generate(final Config config) {
-    final Directory contentDir = Directory(path.absolute(config.contentfolder));
-    final Directory templateDir =
-        Directory(path.absolute(config.templatefolder));
-    final Directory outputDir = Directory(path.absolute(config.outputfolder));
-    final Directory dataDir = Directory(path.absolute(config.datafolder));
-    final Directory partialsDir =
-        Directory(path.absolute(config.partialsfolder));
-    final Directory assetsDir = Directory(path.absolute(config.assetsfolder));
+    final contentDir = Directory(path.absolute(config.contentfolder));
+    final templateDir = Directory(path.absolute(config.templatefolder));
+    final outputDir = Directory(path.absolute(config.outputfolder));
+    final dataDir = Directory(path.absolute(config.datafolder));
+    final partialsDir = Directory(path.absolute(config.partialsfolder));
+    final assetsDir = Directory(path.absolute(config.assetsfolder));
 
     Validate.isTrue(
         contentDir.existsSync(), "ContentDir ${contentDir.path} must exist!");
@@ -48,38 +44,38 @@ class Generator {
     Validate.isTrue(
         outputDir.existsSync(), "OutputDir ${outputDir.path} must exist!");
 
-    final List<File> files = _listContentFilesIn(contentDir);
-    final List<File> images = _listImagesFilesIn(contentDir);
-    final List<File> assets = _listAssetsFilesIn(assetsDir);
-    final List<File> templates = _listTemplatesIn(templateDir);
-    final List<File> dataFiles =
-        dataDir.existsSync() ? _listDataFilesIn(dataDir) : List<File>();
+    final files = _listContentFilesIn(contentDir);
+    final images = _listImagesFilesIn(contentDir);
+    final assets = _listAssetsFilesIn(assetsDir);
+    final templates = _listTemplatesIn(templateDir);
+    final dataFiles =
+        dataDir.existsSync() ? _listDataFilesIn(dataDir) : <File>[];
 
-    final Map dataMap = _getDataMap(dataFiles);
+    final dataMap = _getDataMap(dataFiles);
 
     _logger.info("Generating .html files...");
-    for (final File file in files) {
-      final String relativeFileName =
+    for (final file in files) {
+      final relativeFileName =
           file.path.replaceAll("${contentDir.path}", "").replaceFirst("/", "");
-      final String relativePath =
-          path.dirname(relativeFileName).replaceFirst(".", "");
-      final String extension =
+      final relativePath = path.dirname(relativeFileName).replaceFirst(".", "");
+      final extension =
           path.extension(relativeFileName).replaceFirst(".", "").toLowerCase();
 
       _logger.fine("\nFile: ${relativeFileName}, Path: $relativePath");
-      final List<String> lines = file.readAsLinesSync();
-      Map<String, dynamic> pageOptions = <String, dynamic>{};
+      final lines = file.readAsLinesSync();
+      var pageOptions = <String, dynamic>{};
 
-      final bool hasYamlBlock =
+      final hasYamlBlock =
           _hasYamlBlock(config.yamldelimeter, lines, extension);
       if (hasYamlBlock) {
-        List<String> yamlBlock =
+        final yamlBlock =
             _extractYamlBlockFrom(config.yamldelimeter, lines, extension);
-        if (yamlBlock.length > 0) {
-          final String block = yamlBlock.join('\n');
-          final yaml.YamlMap ym = yaml.loadYaml(block);
+        if (yamlBlock.isNotEmpty) {
+          final block = yamlBlock.join('\n');
+          final ym = yaml.loadYaml(block) as yaml.YamlMap;
 
-          pageOptions.addAll(ym.map((key, value) {
+          pageOptions
+              .addAll(ym.map<String, dynamic>((dynamic key, dynamic value) {
             if (value is yaml.YamlList) {
               return MapEntry<String, yaml.YamlList>(key.toString(), value);
             }
@@ -111,20 +107,21 @@ class Generator {
 
       pageOptions['_template'] = "none";
 
-      String outputExtension = extension;
+      var outputExtension = extension;
       if (isMarkdown(file) &&
           _isMarkdownSupported(config.usemarkdown, pageOptions)) {
-        pageOptions['_content'] = md.markdownToHtml(pageOptions['_content'],
-            inlineSyntaxes: [InlineHtmlSyntax()],
-            extensionSet: ExtensionSet.gitHubWeb);
-        outputExtension = "html";
+        pageOptions['_content'] = md.markdownToHtml(
+            pageOptions['_content'] as String,
+            inlineSyntaxes: [md.InlineHtmlSyntax()],
+            extensionSet: md.ExtensionSet.gitHubWeb);
+        outputExtension = 'html';
       }
 
-      String templateContent = "{{_content}}";
+      var templateContent = '{{_content}}';
       if (hasYamlBlock == true &&
           (pageOptions.containsKey("template") == false ||
               pageOptions["template"] != "none")) {
-        final File template = _getTemplateFor(
+        final template = _getTemplateFor(
             file, pageOptions, templates, config.defaulttemplate);
         pageOptions['_template'] = template.path;
         _logger.fine("Template: ${path.basename(template.path)}");
@@ -136,7 +133,7 @@ class Generator {
         _showPageOptions(relativeFileName, relativePath, pageOptions, config);
       }
 
-      final String content = _fixPathRefs(
+      final content = _fixPathRefs(
           renderTemplate(
               templateContent,
               pageOptions,
@@ -144,24 +141,23 @@ class Generator {
                   isMarkdownSupported: config.usemarkdown)),
           config);
 
-      final String outputFilename =
+      final outputFilename =
           "${path.basenameWithoutExtension(relativeFileName)}.${outputExtension}";
-      final Directory outputPath = _createOutputPath(outputDir, relativePath);
-      final File outputFile = File("${outputPath.path}/$outputFilename");
+      final outputPath = _createOutputPath(outputDir, relativePath);
+      final outputFile = File("${outputPath.path}/$outputFilename");
 
       outputFile.writeAsStringSync(content);
       _logger.info(
           "   ${outputFile.path.replaceFirst(outputDir.path, "")} - done!");
     }
 
-    for (final File image in images) {
-      final String relativeFileName =
+    for (final image in images) {
+      final relativeFileName =
           image.path.replaceAll("${contentDir.path}", "").replaceFirst("/", "");
-      final String relativePath =
-          path.dirname(relativeFileName).replaceFirst(".", "");
+      final relativePath = path.dirname(relativeFileName).replaceFirst(".", "");
 
-      final Directory outputPath = _createOutputPath(outputDir, relativePath);
-      final File outputFile =
+      final outputPath = _createOutputPath(outputDir, relativePath);
+      final outputFile =
           File("${outputPath.path}/${path.basename(relativeFileName)}");
       image.copySync(outputFile.path);
 
@@ -169,14 +165,13 @@ class Generator {
           "   ${outputFile.path.replaceFirst(outputDir.path, "")} - copied!");
     }
 
-    for (final File asset in assets) {
-      final String relativeFileName =
+    for (final asset in assets) {
+      final relativeFileName =
           asset.path.replaceAll("${assetsDir.path}", "").replaceFirst("/", "");
-      final String relativePath =
-          path.dirname(relativeFileName).replaceFirst(".", "");
+      final relativePath = path.dirname(relativeFileName).replaceFirst(".", "");
 
-      final Directory outputPath = _createOutputPath(outputDir, relativePath);
-      final File outputFile =
+      final outputPath = _createOutputPath(outputDir, relativePath);
+      final outputFile =
           File("${outputPath.path}/${path.basename(relativeFileName)}");
       asset.copySync(outputFile.path);
 
@@ -185,24 +180,23 @@ class Generator {
     }
   }
 
-  /**
-     * If there is a reference to a partial in the yaml block the contents of the partial becomes the the
-     * contents of the page-var.
-     *
-     * Example: yaml-block in file
-     *  ...
-     *  dart: ->usage.badge.dart
-     *  ~~~
-     *
-     *  dart is the page-var.
-     *  usage.badge.dart is the partial.
-     */
+  /// If there is a reference to a partial in the yaml block the contents of the partial becomes the the
+  /// contents of the page-var.
+  ///
+  /// Example: yaml-block in file
+  /// ...
+  /// dart: ->usage.badge.dart
+  /// ~~~
+  ///
+  /// dart is the page-var.
+  /// usage.badge.dart is the partial.
+  ///
   void _resolvePartialsInYamlBlock(final Directory partialsDir,
       final Map<String, dynamic> pageOptions, bool useMarkdown) {
     pageOptions.keys.forEach((final String key) {
       if (pageOptions[key] is String &&
           (pageOptions[key] as String).contains("->")) {
-        final String partial =
+        final partial =
             (pageOptions[key] as String).replaceAll(RegExp(r"[^>]*>"), "");
         pageOptions[key] = renderTemplate("{{>${partial}}}", pageOptions,
             _partialsResolver(partialsDir, isMarkdownSupported: useMarkdown));
@@ -210,23 +204,22 @@ class Generator {
     });
   }
 
-  /**
-     * Returns a partials-Resolver. The partials-Resolver gets a dot separated name. This name is translated
-     * into a filename / directory in _partials.
-     * Example:
-     *  Name: category.house -> category/house.[html | md]
-     */
+  /// Returns a partials-Resolver. The partials-Resolver gets a dot separated name. This name is translated
+  /// into a filename / directory in _partials.
+  /// Example:
+  /// Name: category.house -> category/house.[html | md]
+  ///
   PartialsResolver _partialsResolver(final Directory partialsDir,
-      {final bool isMarkdownSupported: true}) {
+      {final bool isMarkdownSupported = true}) {
     Validate.notNull(partialsDir);
 
     mustache.Template resolver(final String name) {
-      final File partialHtml =
+      final partialHtml =
           File("${partialsDir.path}/${name.replaceAll(".", "/")}.html");
-      final File partialMd =
+      final partialMd =
           File("${partialsDir.path}/${name.replaceAll(".", "/")}.md");
 
-      String content = "Partial with name {{$name}} is not available";
+      var content = "Partial with name {{$name}} is not available";
       if (partialHtml.existsSync()) {
         content = partialHtml.readAsStringSync();
       } else if (partialMd.existsSync()) {
@@ -234,8 +227,8 @@ class Generator {
         if (isMarkdownSupported) {
           content = md.markdownToHtml(
             content,
-            inlineSyntaxes: [InlineHtmlSyntax()],
-            extensionSet: ExtensionSet.gitHubWeb,
+            inlineSyntaxes: [md.InlineHtmlSyntax()],
+            extensionSet: md.ExtensionSet.gitHubWeb,
           );
         }
       }
@@ -250,7 +243,7 @@ class Generator {
       final Directory outputDir, final String relativePath) {
     Validate.notNull(outputDir);
 
-    final Directory outputPath = Directory(
+    final outputPath = Directory(
         "${outputDir.path}${relativePath.isNotEmpty ? "/" : ""}${relativePath}");
     if (!outputPath.existsSync()) {
       outputPath.createSync(recursive: true);
@@ -259,13 +252,13 @@ class Generator {
   }
 
   bool isMarkdown(final File file) {
-    final String extension = path.extension(file.path).toLowerCase();
+    final extension = path.extension(file.path).toLowerCase();
     return extension == ".md" || extension == ".markdown";
   }
 
   List<File> _listContentFilesIn(final Directory contentDir) {
     if (!contentDir.existsSync()) {
-      return List<File>();
+      return <File>[];
     }
 
     return contentDir
@@ -273,8 +266,8 @@ class Generator {
         .where((final FileSystemEntity entity) =>
             entity is File &&
             (entity.path.endsWith('.md') ||
-                entity.path.endsWith(".markdown") ||
-                entity.path.endsWith(".dart") ||
+                entity.path.endsWith('.markdown') ||
+                entity.path.endsWith('.dart') ||
                 entity.path.endsWith(".js") ||
                 entity.path.endsWith(".json") ||
                 entity.path.endsWith(".html") ||
@@ -304,7 +297,7 @@ class Generator {
 
   List<File> _listAssetsFilesIn(final Directory contentDir) {
     if (!contentDir.existsSync()) {
-      return List<File>();
+      return <File>[];
     }
 
     return contentDir
@@ -344,7 +337,7 @@ class Generator {
       final bool markdownForSite, final Map page_options) {
     return markdownForSite ||
         (page_options.containsKey('markdown_templating') &&
-            page_options['markdown_templating']);
+            page_options['markdown_templating'] as bool);
   }
 
   bool _hasYamlBlock(final String delimiter, final List<String> content,
@@ -352,11 +345,10 @@ class Generator {
     Validate.notBlank(delimiter);
     Validate.notEmpty(content);
 
-    final String startsWithString =
-        _startStringForYamlBlock(delimiter, forExtension);
-    final String endsWithString = delimiter;
+    final startsWithString = _startStringForYamlBlock(delimiter, forExtension);
+    final endsWithString = delimiter;
 
-    bool hasYamlBlock = content.any((line) =>
+    final hasYamlBlock = content.any((line) =>
         line.startsWith(startsWithString) && line.endsWith(endsWithString));
     return hasYamlBlock;
   }
@@ -367,13 +359,12 @@ class Generator {
     Validate.notEmpty(content);
     Validate.notBlank(forExtension);
 
-    final String yamlStartBlock =
-        _startStringForYamlBlock(delimiter, forExtension);
-    final List<String> lines = content
+    final yamlStartBlock = _startStringForYamlBlock(delimiter, forExtension);
+    final lines = content
         .skip(1)
         .takeWhile((line) => !line.startsWith(yamlStartBlock))
         .toList();
-    final List<String> yamlBlock = List<String>();
+    final yamlBlock = <String>[];
 
     switch (forExtension) {
       case "dart":
@@ -394,9 +385,9 @@ class Generator {
     Validate.notBlank(delimiter);
     Validate.notBlank(forExtension);
 
-    String startsWithString = delimiter;
+    var startsWithString = delimiter;
     switch (forExtension) {
-      case "dart":
+      case 'dart':
         startsWithString = "//$delimiter";
         break;
     }
@@ -408,7 +399,7 @@ class Generator {
       final File file,
       final Map<String, dynamic> pageOptions,
       final Map<String, String> siteOptions) {
-    final String filename = path.basenameWithoutExtension(file.path);
+    final filename = path.basenameWithoutExtension(file.path);
     pageOptions.putIfAbsent('title', () => filename);
 
     pageOptions['_site'] = siteOptions;
@@ -416,10 +407,10 @@ class Generator {
     //_logger.info(pageOptions.toString());
 
     /// See [DateFormat](https://api.dartlang.org/docs/channels/stable/latest/intl/DateFormat.html) for formatting options
-    var date_format = DateFormat(defaultDateFormat);
+    final date_format = DateFormat(defaultDateFormat);
 
     if (pageOptions.containsKey('date_format')) {
-      var page_date_format = DateFormat(pageOptions['date_format']);
+      final page_date_format = DateFormat(pageOptions['date_format'] as String);
       pageOptions['_date'] = page_date_format.format(file.lastModifiedSync());
     } else {
       pageOptions['_date'] = date_format.format(file.lastModifiedSync());
@@ -429,19 +420,18 @@ class Generator {
   }
 
   Map _getDataMap(final List<File> dataFiles) {
-    final Map<String, dynamic> dataMap = Map<String, dynamic>();
+    final dataMap = <String, dynamic>{};
 
     dataFiles.forEach((final File file) {
       if (file.existsSync()) {
-        var data;
+        dynamic data;
         if (path.extension(file.path) == ".yaml") {
           data = yaml.loadYaml(file.readAsStringSync());
         } else {
           data = json.decode(file.readAsStringSync());
         }
 
-        final String filename =
-            path.basenameWithoutExtension(file.path).toLowerCase();
+        final filename = path.basenameWithoutExtension(file.path).toLowerCase();
         dataMap[filename] = data;
       }
     });
@@ -449,32 +439,31 @@ class Generator {
     return dataMap;
   }
 
-  /**
-     * Sample: <link rel="stylesheet" href="{{_page.relative_to_root}}/styles/main.css">
-     *   produces <link rel="stylesheet" href="../styles/main.css"> for about/index.html
-     *
-     * Sample:
-     *   <a href="index.html" class="mdl-layout__tab {{#_page.index}}{{_page.index}}{{/_page.index}}">Overview</a>
-     *   produces:
-     *      <a href="index.html" class="mdl-layout__tab is-active">Overview</a>
-     *   if the current page is index.html
-     */
+  /// Sample: <link rel="stylesheet" href="{{_page.relative_to_root}}/styles/main.css">
+  ///  produces <link rel="stylesheet" href="../styles/main.css"> for about/index.html
+  ///
+  /// Sample:
+  ///  <a href="index.html" class="mdl-layout__tab {{#_page.index}}{{_page.index}}{{/_page.index}}">Overview</a>
+  ///  produces:
+  ///     <a href="index.html" class="mdl-layout__tab is-active">Overview</a>
+  ///  if the current page is index.html
+  ///
   Map<String, dynamic> _fillInPageNestingLevel(
       final String relativeFileName, Map<String, dynamic> pageOptions) {
     Validate.notBlank(relativeFileName);
 
-    String backPath = "";
-    int nestingLevel = 0;
+    var backPath = '';
+    var nestingLevel = 0;
     if (relativeFileName.contains("/")) {
       nestingLevel = relativeFileName.split("/").length - 1;
-      for (int counter = 0; counter < nestingLevel; counter++) {
+      for (var counter = 0; counter < nestingLevel; counter++) {
         backPath = backPath + "../";
       }
     }
 
-    final String pathWithoutExtension = path.withoutExtension(relativeFileName);
+    final pathWithoutExtension = path.withoutExtension(relativeFileName);
     // final String portablePath = pathWithoutExtension.replaceAll( RegExp("(/|\\\\\)"),":");
-    final String pageIndicator =
+    final pageIndicator =
         pathWithoutExtension.replaceAll(RegExp("(/|\\\\\)"), "_");
     pageOptions["_page"] = {
       "filename": pathWithoutExtension,
@@ -492,9 +481,8 @@ class Generator {
 
   File _getTemplateFor(final File file, final Map page_options,
       final List<File> templates, final String defaultTemplate) {
-    final String filenameWithoutExtension =
-        path.basenameWithoutExtension(file.path);
-    final String filepath = path.normalize(file.path);
+    final filenameWithoutExtension = path.basenameWithoutExtension(file.path);
+    final filepath = path.normalize(file.path);
 
     File template;
     //_logger.info("Templates: ${templates}, Default: ${defaultTemplate}");
@@ -521,10 +509,9 @@ class Generator {
     return template;
   }
 
-  /**
-     * Redirect resource links using relative paths to the output directory.
-     * Currently only supports replacing Unix-style relative paths.
-     */
+  /// Redirect resource links using relative paths to the output directory.
+  /// Currently only supports replacing Unix-style relative paths.
+  ///
   String _fixPathRefs(String html, final Config config) {
     var relative_output =
         path.relative(config.outputfolder, from: config.templatefolder);
@@ -556,9 +543,8 @@ class Generator {
 //        return fileContent;
 //    }
 
-  /**
-     * Shows all the available vars for the current page
-     */
+  /// Shows all the available vars for the current page
+  ///
   void _showPageOptions(
       final String relativeFileName,
       final String relativePath,
@@ -578,7 +564,7 @@ class Generator {
         if (value is Map) {
           _showMap(value as Map<String, dynamic>, nestingLevel + 1);
         } else {
-          String valueAsString = value.toString().replaceAll(
+          var valueAsString = value.toString().replaceAll(
               RegExp("(\n|\r|\\s{2,}|${_NEWLINE_PROTECTOR})", multiLine: true),
               "");
 
