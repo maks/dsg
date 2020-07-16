@@ -2,7 +2,7 @@ name: dsg
 description: "Static site generator. Supports markdown, mustache, partials, assets, sass. Webserver included."
 homepage: https://github.com/maks/dsg
 
-version: 1.0.2
+version: 1.0.3
 
 environment:
   sdk: ">=2.8.0 <3.0.0"
