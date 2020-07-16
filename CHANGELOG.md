@@ -8,17 +8,17 @@
 * remove use of new keyword [ec319cc](https://github.com/maks/dsg/commit/ec319cc8b328aabf468bfb9e3b5593370806a7d1)
 
 
-## [v1.0.2](http://github.com/maks/dsg/compare/v1.0.1...v1.0.2) - 2020-07-13
+## [v1.0.2](https://github.com/maks/dsg/compare/v1.0.1...v1.0.2) - 2020-07-13
 
 ### Docs
 * removed dart file from sample [65116af](https://github.com/maks/dsg/commit/65116afaea1a9d8a8c6ccca3a091b486746881e5)
 
-## [v1.0.1](http://github.com/maks/dsg/compare/v1.0.0...v1.0.1) - 2020-07-13
+## [v1.0.1](https://github.com/maks/dsg/compare/v1.0.0...v1.0.1) - 2020-07-13
 
 ### Fixes
 * naming lints for pub.dev [e52e617](https://github.com/maks/dsg/commit/e52e617eeb104e56ade8395a27fbf0c4945abf9f)
 
-## [v1.0.0](http://github.com/maks/dsg/compare/v0.0.1...v1.0.0) - 2020-07-13
+## [v1.0.0](https://github.com/maks/dsg/compare/v0.0.1...v1.0.0) - 2020-07-13
 
 ### Feature
 * update naming for DSG fork [45932db](https://github.com/maks/dsg/commit/45932dbb165c6c9b0f294ae4a41936e025f785c5)
