@@ -13,7 +13,7 @@ class CommandManager {
   static Future<CommandManager> getInstance() async {
     if (_commandmanager == null) {
       final commands = await _getAvailableCommands();
-      _commandmanager = new CommandManager._private(commands);
+      _commandmanager = CommandManager._private(commands);
     }
     return _commandmanager;
   }
@@ -34,7 +34,7 @@ class Command {
 
 /// Test if necessary commands are available
 Future<Map<String, Command>> _getAvailableCommands() async {
-  final Map<String, Command> commands = new Map<String, Command>();
+  final Map<String, Command> commands = Map<String, Command>();
   final List<String> names = <String>[
     CommandManager.SASS,
     CommandManager.SASSC,
@@ -46,7 +46,7 @@ Future<Map<String, Command>> _getAvailableCommands() async {
   await Future.forEach(names, (final String binName) async {
     try {
       final String exe = await where(binName);
-      commands[binName] = new Command(binName, exe);
+      commands[binName] = Command(binName, exe);
     } catch (_) {}
   });
 

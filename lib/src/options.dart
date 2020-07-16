@@ -55,7 +55,7 @@ class Options {
   }
 
   static ArgParser _createParser() {
-    final ArgParser parser = new ArgParser()
+    final ArgParser parser = ArgParser()
       ..addFlag(_ARG_SETTINGS,
           abbr: 's', negatable: false, help: "Prints settings")
       ..addFlag(_ARG_SITE_KEYS,
