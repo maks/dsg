@@ -1,6 +1,11 @@
 # Change Log for dsg
 "Static site generator. Supports markdown, mustache, partials, assets, sass. Webserver included."
 
+## [v1.0.3](https://github.com/maks/dsg/compare/v1.0.3...v1.0.4) - 2020-07-16
+
+### Complete Refactor
+* cleanup code
+
 ## [v1.0.3](https://github.com/maks/dsg/compare/v1.0.2...v1.0.3) - 2020-07-16
 
 ### Refactor
