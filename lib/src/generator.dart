@@ -23,10 +23,10 @@ TemplateRenderer renderTemplate =
 };
 
 class Generator {
-  final Logger _logger = Logger("dsg.Generator");
+  final Logger _logger = Logger('dsg.Generator');
 
   /// Mustache-Renderer strips out newlines
-  static const String _NEWLINE_PROTECTOR = "@@@#@@@";
+  static const String _NEWLINE_PROTECTOR = '@@@#@@@';
 
   /// Render and output your static site (WARNING: overwrites existing HTML files in output directory).
   void generate(final Config config) {
@@ -38,11 +38,11 @@ class Generator {
     final assetsDir = Directory(path.absolute(config.assetsfolder));
 
     Validate.isTrue(
-        contentDir.existsSync(), "ContentDir ${contentDir.path} must exist!");
+        contentDir.existsSync(), 'ContentDir ${contentDir.path} must exist!');
     Validate.isTrue(templateDir.existsSync(),
-        "Templatefolder ${templateDir.path} must exist!");
+        'Templatefolder ${templateDir.path} must exist!');
     Validate.isTrue(
-        outputDir.existsSync(), "OutputDir ${outputDir.path} must exist!");
+        outputDir.existsSync(), 'OutputDir ${outputDir.path} must exist!');
 
     final files = _listContentFilesIn(contentDir);
     final images = _listImagesFilesIn(contentDir);
@@ -53,15 +53,15 @@ class Generator {
 
     final dataMap = _getDataMap(dataFiles);
 
-    _logger.info("Generating .html files...");
+    _logger.info('Generating .html files...');
     for (final file in files) {
       final relativeFileName =
-          file.path.replaceAll("${contentDir.path}", "").replaceFirst("/", "");
-      final relativePath = path.dirname(relativeFileName).replaceFirst(".", "");
+          file.path.replaceAll('${contentDir.path}', '').replaceFirst('/', '');
+      final relativePath = path.dirname(relativeFileName).replaceFirst('.', '');
       final extension =
-          path.extension(relativeFileName).replaceFirst(".", "").toLowerCase();
+          path.extension(relativeFileName).replaceFirst('.', '').toLowerCase();
 
-      _logger.fine("\nFile: ${relativeFileName}, Path: $relativePath");
+      _logger.fine('\nFile: ${relativeFileName}, Path: $relativePath');
       final lines = file.readAsLinesSync();
       var pageOptions = <String, dynamic>{};
 
@@ -88,7 +88,7 @@ class Generator {
           _resolvePartialsInYamlBlock(
               partialsDir, pageOptions, config.usemarkdown);
 
-          // +1 for the YAML-Block-Delimiter ("~~~") line
+          // +1 for the YAML-Block-Delimiter ('~~~') line
           lines.removeRange(0, yamlBlock.length + 1);
         } else {
           lines.removeRange(0, 1);
@@ -105,7 +105,7 @@ class Generator {
           _partialsResolver(partialsDir,
               isMarkdownSupported: config.usemarkdown));
 
-      pageOptions['_template'] = "none";
+      pageOptions['_template'] = 'none';
 
       var outputExtension = extension;
       if (isMarkdown(file) &&
@@ -119,17 +119,17 @@ class Generator {
 
       var templateContent = '{{_content}}';
       if (hasYamlBlock == true &&
-          (pageOptions.containsKey("template") == false ||
-              pageOptions["template"] != "none")) {
+          (pageOptions.containsKey('template') == false ||
+              pageOptions['template'] != 'none')) {
         final template = _getTemplateFor(
             file, pageOptions, templates, config.defaulttemplate);
         pageOptions['_template'] = template.path;
-        _logger.fine("Template: ${path.basename(template.path)}");
+        _logger.fine('Template: ${path.basename(template.path)}');
 
         templateContent = template.readAsStringSync();
       }
 
-      if (config.loglevel == "debug") {
+      if (config.loglevel == 'debug') {
         _showPageOptions(relativeFileName, relativePath, pageOptions, config);
       }
 
@@ -142,41 +142,44 @@ class Generator {
           config);
 
       final outputFilename =
-          "${path.basenameWithoutExtension(relativeFileName)}.${outputExtension}";
+          '${path.basenameWithoutExtension(relativeFileName)}.${outputExtension}';
       final outputPath = _createOutputPath(outputDir, relativePath);
-      final outputFile = File("${outputPath.path}/$outputFilename");
+      final outputFile = File('${outputPath.path}/$outputFilename');
 
       outputFile.writeAsStringSync(content);
-      _logger.info(
-          "   ${outputFile.path.replaceFirst(outputDir.path, "")} - done!");
+      final outputPathReplaced =
+          outputFile.path.replaceFirst(outputDir.path, '');
+      _logger.info('   $outputPathReplaced - done!');
     }
 
     for (final image in images) {
       final relativeFileName =
-          image.path.replaceAll("${contentDir.path}", "").replaceFirst("/", "");
-      final relativePath = path.dirname(relativeFileName).replaceFirst(".", "");
+          image.path.replaceAll('${contentDir.path}', '').replaceFirst('/', '');
+      final relativePath = path.dirname(relativeFileName).replaceFirst('.', '');
 
       final outputPath = _createOutputPath(outputDir, relativePath);
       final outputFile =
-          File("${outputPath.path}/${path.basename(relativeFileName)}");
+          File('${outputPath.path}/${path.basename(relativeFileName)}');
       image.copySync(outputFile.path);
 
-      _logger.info(
-          "   ${outputFile.path.replaceFirst(outputDir.path, "")} - copied!");
+      final outputPathReplaced =
+          outputFile.path.replaceFirst(outputDir.path, '');
+      _logger.info('   $outputPathReplaced - copied!');
     }
 
     for (final asset in assets) {
       final relativeFileName =
-          asset.path.replaceAll("${assetsDir.path}", "").replaceFirst("/", "");
-      final relativePath = path.dirname(relativeFileName).replaceFirst(".", "");
+          asset.path.replaceAll('${assetsDir.path}', '').replaceFirst('/', '');
+      final relativePath = path.dirname(relativeFileName).replaceFirst('.', '');
 
       final outputPath = _createOutputPath(outputDir, relativePath);
       final outputFile =
-          File("${outputPath.path}/${path.basename(relativeFileName)}");
+          File('${outputPath.path}/${path.basename(relativeFileName)}');
       asset.copySync(outputFile.path);
 
-      _logger.info(
-          "   ${outputFile.path.replaceFirst(outputDir.path, "")} - copied!");
+      final outputPathReplaced =
+          outputFile.path.replaceFirst(outputDir.path, '');
+      _logger.info('   $outputPathReplaced - copied!');
     }
   }
 
@@ -195,10 +198,10 @@ class Generator {
       final Map<String, dynamic> pageOptions, bool useMarkdown) {
     pageOptions.keys.forEach((final String key) {
       if (pageOptions[key] is String &&
-          (pageOptions[key] as String).contains("->")) {
+          (pageOptions[key] as String).contains('->')) {
         final partial =
-            (pageOptions[key] as String).replaceAll(RegExp(r"[^>]*>"), "");
-        pageOptions[key] = renderTemplate("{{>${partial}}}", pageOptions,
+            (pageOptions[key] as String).replaceAll(RegExp(r'[^>]*>'), '');
+        pageOptions[key] = renderTemplate('{{>${partial}}}', pageOptions,
             _partialsResolver(partialsDir, isMarkdownSupported: useMarkdown));
       }
     });
@@ -214,12 +217,12 @@ class Generator {
     Validate.notNull(partialsDir);
 
     mustache.Template resolver(final String name) {
-      final partialHtml =
-          File("${partialsDir.path}/${name.replaceAll(".", "/")}.html");
-      final partialMd =
-          File("${partialsDir.path}/${name.replaceAll(".", "/")}.md");
+      final partialPath = partialsDir.path;
+      final replacedName = name.replaceAll('.', '/');
+      final partialHtml = File('$partialPath/$replacedName.html');
+      final partialMd = File('$partialPath/$replacedName.md');
 
-      var content = "Partial with name {{$name}} is not available";
+      var content = 'Partial with name {{$name}} is not available';
       if (partialHtml.existsSync()) {
         content = partialHtml.readAsStringSync();
       } else if (partialMd.existsSync()) {
@@ -233,7 +236,7 @@ class Generator {
         }
       }
 
-      return mustache.Template(content, name: "{{$name}}");
+      return mustache.Template(content, name: '{{$name}}');
     }
 
     return resolver;
@@ -243,8 +246,8 @@ class Generator {
       final Directory outputDir, final String relativePath) {
     Validate.notNull(outputDir);
 
-    final outputPath = Directory(
-        "${outputDir.path}${relativePath.isNotEmpty ? "/" : ""}${relativePath}");
+    final relPath = relativePath.isNotEmpty ? '/' : '';
+    final outputPath = Directory('${outputDir.path}${relPath}${relativePath}');
     if (!outputPath.existsSync()) {
       outputPath.createSync(recursive: true);
     }
@@ -253,7 +256,7 @@ class Generator {
 
   bool isMarkdown(final File file) {
     final extension = path.extension(file.path).toLowerCase();
-    return extension == ".md" || extension == ".markdown";
+    return extension == '.md' || extension == '.markdown';
   }
 
   List<File> _listContentFilesIn(final Directory contentDir) {
@@ -268,13 +271,13 @@ class Generator {
             (entity.path.endsWith('.md') ||
                 entity.path.endsWith('.markdown') ||
                 entity.path.endsWith('.dart') ||
-                entity.path.endsWith(".js") ||
-                entity.path.endsWith(".json") ||
-                entity.path.endsWith(".html") ||
-                entity.path.endsWith(".scss") ||
-                entity.path.endsWith(".css") ||
-                entity.path.endsWith(".svg")) &&
-            !entity.path.contains("packages"))
+                entity.path.endsWith('.js') ||
+                entity.path.endsWith('.json') ||
+                entity.path.endsWith('.html') ||
+                entity.path.endsWith('.scss') ||
+                entity.path.endsWith('.css') ||
+                entity.path.endsWith('.svg')) &&
+            !entity.path.contains('packages'))
         .map((final FileSystemEntity entity) => entity as File)
         .toList();
   }
@@ -285,12 +288,12 @@ class Generator {
         .where((file) =>
             file is File &&
             (file.path.endsWith('.png') ||
-                file.path.endsWith(".jpg") ||
-                file.path.endsWith(".gif") ||
-                file.path.endsWith(".woff") ||
-                file.path.endsWith(".tff") ||
-                file.path.endsWith(".pdf")) &&
-            !file.path.contains("packages"))
+                file.path.endsWith('.jpg') ||
+                file.path.endsWith('.gif') ||
+                file.path.endsWith('.woff') ||
+                file.path.endsWith('.tff') ||
+                file.path.endsWith('.pdf')) &&
+            !file.path.contains('packages'))
         .map((final FileSystemEntity entity) => entity as File)
         .toList();
   }
@@ -304,12 +307,12 @@ class Generator {
         .listSync(recursive: true)
         .where((file) =>
             file is File &&
-            (file.path.endsWith(".png") ||
-                file.path.endsWith(".jpg") ||
-                file.path.endsWith(".scss") ||
-                file.path.endsWith(".css") ||
-                file.path.endsWith(".svg")) &&
-            !file.path.contains("packages"))
+            (file.path.endsWith('.png') ||
+                file.path.endsWith('.jpg') ||
+                file.path.endsWith('.scss') ||
+                file.path.endsWith('.css') ||
+                file.path.endsWith('.svg')) &&
+            !file.path.contains('packages'))
         .map((final FileSystemEntity entity) => entity as File)
         .toList();
   }
@@ -317,7 +320,7 @@ class Generator {
   List<File> _listTemplatesIn(final Directory templateDir) {
     return templateDir
         .listSync()
-        .where((file) => file is File && !file.path.contains("packages"))
+        .where((file) => file is File && !file.path.contains('packages'))
         .map((final FileSystemEntity entity) => entity as File)
         .toList();
   }
@@ -327,8 +330,8 @@ class Generator {
         .listSync(recursive: true)
         .where((file) =>
             file is File &&
-            (file.path.endsWith('.yaml') || file.path.endsWith(".json")) &&
-            !file.path.contains("packages"))
+            (file.path.endsWith('.yaml') || file.path.endsWith('.json')) &&
+            !file.path.contains('packages'))
         .map((final FileSystemEntity entity) => entity as File)
         .toList();
   }
@@ -367,9 +370,9 @@ class Generator {
     final yamlBlock = <String>[];
 
     switch (forExtension) {
-      case "dart":
+      case 'dart':
         lines.forEach((final String line) {
-          yamlBlock.add(line.replaceFirst(RegExp(r"// "), ""));
+          yamlBlock.add(line.replaceFirst(RegExp(r'// '), ''));
         });
         break;
 
@@ -388,7 +391,7 @@ class Generator {
     var startsWithString = delimiter;
     switch (forExtension) {
       case 'dart':
-        startsWithString = "//$delimiter";
+        startsWithString = '//$delimiter';
         break;
     }
     return startsWithString;
@@ -425,7 +428,7 @@ class Generator {
     dataFiles.forEach((final File file) {
       if (file.existsSync()) {
         dynamic data;
-        if (path.extension(file.path) == ".yaml") {
+        if (path.extension(file.path) == '.yaml') {
           data = yaml.loadYaml(file.readAsStringSync());
         } else {
           data = json.decode(file.readAsStringSync());
@@ -454,26 +457,26 @@ class Generator {
 
     var backPath = '';
     var nestingLevel = 0;
-    if (relativeFileName.contains("/")) {
-      nestingLevel = relativeFileName.split("/").length - 1;
+    if (relativeFileName.contains('/')) {
+      nestingLevel = relativeFileName.split('/').length - 1;
       for (var counter = 0; counter < nestingLevel; counter++) {
-        backPath = backPath + "../";
+        backPath = backPath + '../';
       }
     }
 
     final pathWithoutExtension = path.withoutExtension(relativeFileName);
-    // final String portablePath = pathWithoutExtension.replaceAll( RegExp("(/|\\\\\)"),":");
+    // final String portablePath = pathWithoutExtension.replaceAll( RegExp('(/|\\\\\)'),':');
     final pageIndicator =
-        pathWithoutExtension.replaceAll(RegExp("(/|\\\\\)"), "_");
-    pageOptions["_page"] = {
-      "filename": pathWithoutExtension,
-      "pageindicator": pageIndicator,
-      "relative_to_root": backPath,
-      "nesting_level": nestingLevel,
+        pathWithoutExtension.replaceAll(RegExp('(/|\\\\\)'), '_');
+    pageOptions['_page'] = {
+      'filename': pathWithoutExtension,
+      'pageindicator': pageIndicator,
+      'relative_to_root': backPath,
+      'nesting_level': nestingLevel,
 
       /// you can use this like
       ///     {{#_page.index}}{{_page.index}}{{/_page.index}
-      pageIndicator: "is-active",
+      pageIndicator: 'is-active',
     };
 
     return pageOptions;
@@ -485,7 +488,7 @@ class Generator {
     final filepath = path.normalize(file.path);
 
     File template;
-    //_logger.info("Templates: ${templates}, Default: ${defaultTemplate}");
+    //_logger.info('Templates: ${templates}, Default: ${defaultTemplate}');
 
     try {
       if (page_options.containsKey('template')) {
@@ -503,7 +506,7 @@ class Generator {
             filenameWithoutExtension);
       }
     } catch (e) {
-      throw "No template given for '$filepath!";
+      throw 'No template given for $filepath!';
     }
 
     return template;
@@ -516,7 +519,7 @@ class Generator {
     var relative_output =
         path.relative(config.outputfolder, from: config.templatefolder);
 
-    relative_output = "$relative_output/".replaceAll("\\", "/");
+    relative_output = '$relative_output/'.replaceAll('\\', '/');
     //_logger.info(relative_output);
 
     html = html
@@ -555,28 +558,28 @@ class Generator {
     Validate.notNull(pageOptions);
     Validate.notNull(config);
 
-    _logger.fine("   --- ${(relativeFileName + " ").padRight(76, "-")}");
+    _logger.fine('   --- ${(relativeFileName + " ").padRight(76, "-")}');
 
     void _showMap(final Map<String, dynamic> values, final int nestingLevel) {
       values.forEach((final String key, final dynamic value) {
-        _logger.fine("    ${"".padRight(nestingLevel * 2)} $key.");
+        _logger.fine('    ${"".padRight(nestingLevel * 2)} $key.');
 
         if (value is Map) {
           _showMap(value as Map<String, dynamic>, nestingLevel + 1);
         } else {
           var valueAsString = value.toString().replaceAll(
-              RegExp("(\n|\r|\\s{2,}|${_NEWLINE_PROTECTOR})", multiLine: true),
-              "");
+              RegExp('(\n|\r|\\s{2,}|${_NEWLINE_PROTECTOR})', multiLine: true),
+              '');
 
           valueAsString =
               valueAsString.substring(0, min(50, max(valueAsString.length, 0)));
           _logger.fine(
-              "    ${"".padRight(nestingLevel * 2)} $key -> [${valueAsString}]");
+              '    ${"".padRight(nestingLevel * 2)} $key -> [${valueAsString}]');
         }
       });
     }
 
     _showMap(pageOptions, 0);
-    _logger.fine("   ${"".padRight(80, "-")}");
+    _logger.fine('   ${"".padRight(80, "-")}');
   }
 }
