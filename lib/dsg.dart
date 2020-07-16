@@ -10,7 +10,7 @@ import 'package:console_log_handler/print_log_handler.dart';
 import 'package:http_server/http_server.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
-import 'package:markdown/markdown.dart'as md;
+import 'package:markdown/markdown.dart' as md;
 import 'package:packages/packages.dart';
 import 'package:path/path.dart' as path;
 import 'package:reflected_mustache/mustache.dart' as mustache;
@@ -27,7 +27,7 @@ part 'src/generator.dart';
 part 'src/init.dart';
 part 'src/options.dart';
 
-bool _runsOnOSX() => (SysInfo.operatingSystemName == "Mac OS X");
+bool _runsOnOSX() => (SysInfo.operatingSystemName == 'Mac OS X');
 
 Future main(List<String> arguments) async {
   final application = Application();

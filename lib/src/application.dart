@@ -1,7 +1,7 @@
 part of dsg;
 
 class Application {
-  final Logger _logger = Logger("dsg.Application");
+  final Logger _logger = Logger('dsg.Application');
 
   /// Commandline options
   final Options options;
@@ -166,22 +166,22 @@ class Application {
       connect.then((final server) {
         _logger.info('Server running $ip on port: $port, $MY_HTTP_ROOT_PATH');
         server.listen((final request) {
-          if (request.uri.path.startsWith("/packages") && hasPackages) {
-            final parts = request.uri.path.split(RegExp(r"(?:/|\\)"));
-            final path = parts.sublist(3).join("/");
+          if (request.uri.path.startsWith('/packages') && hasPackages) {
+            final parts = request.uri.path.split(RegExp(r'(?:/|\\)'));
+            final path = parts.sublist(3).join('/');
             final packageName = parts[2];
 
             final package =
-                packages.resolvePackageUri(Uri.parse("package:${packageName}"));
-            final rewritten = "${package.lib.path}/$path"
-                .replaceFirst(RegExp(r"^.*pub\.dartlang\.org/"), "package:");
+                packages.resolvePackageUri(Uri.parse('package:${packageName}'));
+            final rewritten = '${package.lib.path}/$path'
+                .replaceFirst(RegExp(r'^.*pub\.dartlang\.org/'), 'package:');
 
             _logger.info(
-                "${request.connectionInfo.remoteAddress.address}:${request.connectionInfo.localPort} - ${request.method} [Rewritten] ${rewritten}");
-            virtDir.serveFile(File("${package.lib.path}/$path"), request);
+                '${request.connectionInfo.remoteAddress.address}:${request.connectionInfo.localPort} - ${request.method} [Rewritten] ${rewritten}');
+            virtDir.serveFile(File('${package.lib.path}/$path'), request);
           } else {
             _logger.info(
-                "${request.connectionInfo.remoteAddress.address}:${request.connectionInfo.localPort} - ${request.method} ${request.uri}");
+                '${request.connectionInfo.remoteAddress.address}:${request.connectionInfo.localPort} - ${request.method} ${request.uri}');
             virtDir.serveRequest(request);
           }
         });
@@ -201,7 +201,7 @@ class Application {
 
     final watcher = DirectoryWatcher(srcDir.path);
     watcher.events
-        .where((final event) => (!event.path.contains("packages")))
+        .where((final event) => (!event.path.contains('packages')))
         .listen((final event) {
       _logger.info(event.toString());
       timerWatch ??= Timer(Duration(milliseconds: 1000), () {
@@ -220,7 +220,7 @@ class Application {
     final scssFiles = _listSCSSFilesIn(dir);
 
     if (scssFiles.isEmpty) {
-      _logger.info("No SCSS files found");
+      _logger.info('No SCSS files found');
       return;
     }
 
@@ -228,7 +228,7 @@ class Application {
 
     try {
       scssFiles.forEach((final File file) {
-        _logger.info("Observing: (watchScss) ${file.path}");
+        _logger.info('Observing: (watchScss) ${file.path}');
 
         file
             .watch(events: FileSystemEvent.modify)
@@ -243,7 +243,7 @@ class Application {
         });
       });
     } on StateError {
-      _logger.info("Found no SCSS without a _ at the beginning...");
+      _logger.info('Found no SCSS without a _ at the beginning...');
     }
   }
 
@@ -263,14 +263,14 @@ class Application {
     final scssFiles = _listSCSSFilesIn(dir);
 
     if (scssFiles.isEmpty) {
-      _logger.info("No SCSS files found");
+      _logger.info('No SCSS files found');
       return;
     }
 
     _compileSCSSFile(cssFolder, config);
 
     try {
-      _logger.info("Observing: (watchAdditionalFolderScss) ${dirToCheck.path}");
+      _logger.info('Observing: (watchAdditionalFolderScss) ${dirToCheck.path}');
 
       dirToCheck
           .watch(events: FileSystemEvent.modify)
@@ -284,41 +284,9 @@ class Application {
         });
       });
     } on StateError {
-      _logger.info("Found no SCSS without a _ at the beginning...");
+      _logger.info('Found no SCSS without a _ at the beginning...');
     }
   }
-
-  // void _watchDir({
-  //   Directory dir,
-  //   int events,
-  //   Function(FileSystemEvent event) whereFilter,
-  //   Function(FileSystemEvent event) listener,
-  //   bool recursive,
-  // }) async {
-  //   if (Platform.isLinux) {
-  //     final dirList = dir
-  //         .listSync(recursive: true)
-  //         .where((entity) => FileSystemEntity.isDirectorySync(entity.path));
-
-  //     for (final dir in dirList) {
-  //       print("WATCH: ${dir.path}");
-  //       dir.watch(events: events, recursive: false).listen(
-  //           (e) => print("file change: $e"),
-  //           onError: (e, stack) => print("$e $stack"));
-  //     }
-  //     // dirList.forEach((dir) {
-  //     //   print("WATCH: ${dir.path}");
-  //     //   dir.watch(events: events, recursive: false).listen(
-  //     //       (e) => print("file change: $e"),
-  //     //       onError: (e, stack) => print("$e $stack"));
-  //     // });
-  //   } else {
-  //     dir
-  //         .watch(events: events, recursive: recursive)
-  //         .where(whereFilter)
-  //         .listen(listener);
-  //   }
-  // }
 
   void _testPreconditions(final CommandManager cm, final Config config) {
     // if not using sass or prefixer, dont check for them being available
@@ -331,8 +299,8 @@ class Application {
         cm.containsKey(CommandManager.AUTOPREFIXER)) {
       return;
     }
-    throw "Please install SASS (${CommandManager.SASS} | ${CommandManager.SASSC}) "
-        "and AutoPrefixer (${CommandManager.AUTOPREFIXER})";
+    throw 'Please install SASS (${CommandManager.SASS} | ${CommandManager.SASSC}) '
+        'and AutoPrefixer (${CommandManager.AUTOPREFIXER})';
   }
 
   void _compileSCSSFile(final String folder, final Config config) {
@@ -344,7 +312,7 @@ class Application {
     final scssFiles = _listSCSSFilesIn(dir);
 
     if (scssFiles.isEmpty) {
-      _logger.info("No SCSS files found");
+      _logger.info('No SCSS files found');
       return;
     }
 
@@ -352,7 +320,7 @@ class Application {
     File _mainScssFile(final List<File> scssFiles) {
       final mainScss = scssFiles.firstWhere((final File file) {
         final pureFilename = path.basename(file.path);
-        return pureFilename.startsWith(RegExp(r"[a-z]", caseSensitive: false));
+        return pureFilename.startsWith(RegExp(r'[a-z]', caseSensitive: false));
       });
       return mainScss;
     }
@@ -360,9 +328,9 @@ class Application {
     final mainScss = _mainScssFile(scssFiles);
 
     final scssFile = mainScss.path;
-    final cssFile = "${path.withoutExtension(scssFile)}.css";
+    final cssFile = '${path.withoutExtension(scssFile)}.css';
 
-    _logger.info("Main SCSS: $scssFile");
+    _logger.info('Main SCSS: $scssFile');
     _compileScss(scssFile, cssFile, config);
     _autoPrefixer(cssFile, config);
   }
@@ -381,7 +349,7 @@ class Application {
 
     if (!config.usesass) {
       _logger
-          .info("Sass was disabled - so your SCSS won't be compiled to CSS!");
+          .info('Sass was disabled - so your SCSS won\'t be compiled to CSS!');
       return;
     }
 
@@ -390,23 +358,23 @@ class Application {
 
     if (config.sasspath.isNotEmpty) {
       // only sass supports SASS_PATH (not sassc)
-      if (!compiler.endsWith("c")) {
-        environment["SASS_PATH"] = config.sasspath;
-        _logger.info("Using SASS_PATH: ${config.sasspath}");
+      if (!compiler.endsWith('c')) {
+        environment['SASS_PATH'] = config.sasspath;
+        _logger.info('Using SASS_PATH: ${config.sasspath}');
       } else {
-        _logger.warning("SASS_PATH ist not supported by your compiler!");
+        _logger.warning('SASS_PATH ist not supported by your compiler!');
       }
     }
 
-    _logger.info("Compiling $source -> $target");
+    _logger.info('Compiling $source -> $target');
     final result =
         Process.runSync(compiler, [source, target], environment: environment);
     if (result.exitCode != 0) {
-      _logger.info("sassc failed with: ${(result.stderr as String).trim()}!");
-      _vickiSay("got a sassc error", config);
+      _logger.info('sassc failed with: ${(result.stderr as String).trim()}!');
+      _vickiSay('got a sassc error', config);
       return;
     }
-    _logger.info("Done!");
+    _logger.info('Done!');
   }
 
   void _autoPrefixer(final String cssFile, final Config config) {
@@ -419,14 +387,14 @@ class Application {
       return;
     }
 
-    _logger.info("Autoprefixing $cssFile");
-    final result = Process.runSync("autoprefixer-cli", [cssFile]);
+    _logger.info('Autoprefixing $cssFile');
+    final result = Process.runSync('autoprefixer-cli', [cssFile]);
     if (result.exitCode != 0) {
-      _logger.info("prefixer faild with: ${(result.stderr as String).trim()}!");
-      _vickiSay("got a prefixer error", config);
+      _logger.info('prefixer faild with: ${(result.stderr as String).trim()}!');
+      _vickiSay('got a prefixer error', config);
       return;
     }
-    _logger.info("Done!");
+    _logger.info('Done!');
   }
 
   List<File> _listSCSSFilesIn(final Directory dir) {
@@ -435,8 +403,8 @@ class Application {
         .listSync(recursive: true)
         .where((final file) {
           return file is File &&
-              file.path.endsWith(".scss") &&
-              !file.path.contains("packages");
+              file.path.endsWith('.scss') &&
+              !file.path.contains('packages');
         })
         .map((final FileSystemEntity entity) => entity as File)
         .toList();
@@ -451,9 +419,9 @@ class Application {
     }
 
     final result = Process.runSync(
-        "say", ['-r', '200', sentence.replaceFirst("wsk_", "")]);
+        'say', ['-r', '200', sentence.replaceFirst('wsk_', '')]);
     if (result.exitCode != 0) {
-      _logger.severe("run faild with: ${(result.stderr as String).trim()}!");
+      _logger.severe('run faild with: ${(result.stderr as String).trim()}!');
     }
   }
 
@@ -466,12 +434,12 @@ class Application {
     // now control the logging.
     // Turn off all logging first
     switch (loglevel) {
-      case "fine":
-      case "debug":
+      case 'fine':
+      case 'debug':
         Logger.root.level = Level.FINE;
         break;
 
-      case "warning":
+      case 'warning':
         Logger.root.level = Level.SEVERE;
         break;
 

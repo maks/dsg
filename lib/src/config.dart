@@ -4,9 +4,9 @@ part of dsg;
 /// Most of these configs can be overwritten by commandline args.
 ///
 class Config {
-  final Logger _logger = Logger("dsg.Config");
+  final Logger _logger = Logger('dsg.Config');
 
-  static const String _CONFIG_FOLDER = ".dsg";
+  static const String _CONFIG_FOLDER = '.dsg';
 
   static const _CONF_CONTENT_DIR = 'content_dir';
   static const _CONF_TEMPLATE_DIR = 'template_dir';
@@ -32,11 +32,11 @@ class Config {
   static const _CONF_CERT_FILE = 'cert_file';
   static const _CONF_KEY_FILE = 'key_file';
 
-  static const _CONF_ADDITIONAL_WATCH_FOLDER1 = "watchfolder1";
-  static const _CONF_ADDITIONAL_WATCH_FOLDER2 = "watchfolder2";
-  static const _CONF_ADDITIONAL_WATCH_FOLDER3 = "watchfolder3";
+  static const _CONF_ADDITIONAL_WATCH_FOLDER1 = 'watchfolder1';
+  static const _CONF_ADDITIONAL_WATCH_FOLDER2 = 'watchfolder2';
+  static const _CONF_ADDITIONAL_WATCH_FOLDER3 = 'watchfolder3';
 
-  static final String _SEARCH_PATH_SEPARATOR = Platform.isWindows ? ";" : ":";
+  static final String _SEARCH_PATH_SEPARATOR = Platform.isWindows ? ';' : ':';
 
   final ArgResults _argResults;
   final Map<String, dynamic> _settings = <String, dynamic>{};
@@ -57,18 +57,18 @@ class Config {
     _settings[Config._CONF_DATE_FORMAT] = 'dd.MM.yyyy';
     _settings[Config._CONF_YAML_DELIMITER] = '~~~';
     _settings[Config._CONF_USE_MARKDOWN] = true;
-    _settings[Config._CONF_DEFAULT_TEMPLATE] = "default.html";
+    _settings[Config._CONF_DEFAULT_TEMPLATE] = 'default.html';
     _settings[Config._CONF_SASS_COMPILER] =
-        _commandmanager.containsKey("sassc") ? "sassc" : "sass";
-    _settings[Config._CONF_SASS_PATH] = "";
-    _settings[Config._CONF_BROWSER] = "Chromium";
+        _commandmanager.containsKey('sassc') ? 'sassc' : 'sass';
+    _settings[Config._CONF_SASS_PATH] = '';
+    _settings[Config._CONF_BROWSER] = 'Chromium';
 
-    _settings[Config._CONF_BROWSER] = "Chromium";
+    _settings[Config._CONF_BROWSER] = 'Chromium';
 
     _settings[Config._CONF_SITE_OPTIONS] = <String, String>{};
 
-    _settings[Options._ARG_IP] = "127.0.0.1";
-    _settings[Config._CONF_PORT] = "8080";
+    _settings[Options._ARG_IP] = '127.0.0.1';
+    _settings[Config._CONF_PORT] = '8080';
 
     _settings[Options._ARG_DOCROOT] = _settings[Config._CONF_OUTPUT_DIR]; // web
 
@@ -81,9 +81,9 @@ class Config {
 
     _settings[Config._CONF_TALK_TO_ME] = _runsOnOSX();
 
-    _settings[Config._CONF_ADDITIONAL_WATCH_FOLDER1] = "";
-    _settings[Config._CONF_ADDITIONAL_WATCH_FOLDER2] = "";
-    _settings[Config._CONF_ADDITIONAL_WATCH_FOLDER3] = "";
+    _settings[Config._CONF_ADDITIONAL_WATCH_FOLDER1] = '';
+    _settings[Config._CONF_ADDITIONAL_WATCH_FOLDER2] = '';
+    _settings[Config._CONF_ADDITIONAL_WATCH_FOLDER3] = '';
 
     _overwriteSettingsWithConfigFile();
     _overwriteSettingsWithArgResults();
@@ -93,7 +93,7 @@ class Config {
 
   String get configfolder => _CONFIG_FOLDER;
 
-  String get configfile => "site.yaml";
+  String get configfile => 'site.yaml';
 
   String get loglevel => _settings[Options._ARG_LOGLEVEL] as String;
 
@@ -157,54 +157,54 @@ class Config {
   Map<String, String> get settings {
     final settings = <String, String>{};
 
-    settings["loglevel"] = loglevel;
+    settings['loglevel'] = loglevel;
 
-    settings["Content folder"] = contentfolder;
-    settings["Template folder"] = templatefolder;
-    settings["Data folder"] = datafolder;
-    settings["Partials folder"] = partialsfolder;
-    settings["Assets folder"] = assetsfolder;
+    settings['Content folder'] = contentfolder;
+    settings['Template folder'] = templatefolder;
+    settings['Data folder'] = datafolder;
+    settings['Partials folder'] = partialsfolder;
+    settings['Assets folder'] = assetsfolder;
 
-    settings["Default template"] = defaulttemplate;
-    settings["Output folder"] = outputfolder;
-    settings["Workspace"] = workspace;
+    settings['Default template'] = defaulttemplate;
+    settings['Output folder'] = outputfolder;
+    settings['Workspace'] = workspace;
 
-    settings["Dateformat"] = dateformat;
-    settings["YAML-Delimeter"] = yamldelimeter;
+    settings['Dateformat'] = dateformat;
+    settings['YAML-Delimeter'] = yamldelimeter;
 
-    settings["Use markdown"] = usemarkdown ? "yes" : "no";
-    settings["Use SASS"] = usesass ? "yes" : "no";
-    settings["Use Autoprefixer"] = useautoprefixer ? "yes" : "no";
+    settings['Use markdown'] = usemarkdown ? 'yes' : 'no';
+    settings['Use SASS'] = usesass ? 'yes' : 'no';
+    settings['Use Autoprefixer'] = useautoprefixer ? 'yes' : 'no';
 
-    settings["Use secure connection"] = usesecureconnection ? "yes" : "no";
-    settings["Cert-file for secure connection"] = certfile;
-    settings["Key-file for secure connection"] = keyfile;
+    settings['Use secure connection'] = usesecureconnection ? 'yes' : 'no';
+    settings['Cert-file for secure connection'] = certfile;
+    settings['Key-file for secure connection'] = keyfile;
 
-    settings["Talk to me"] = talktome ? "yes" : "no";
+    settings['Talk to me'] = talktome ? 'yes' : 'no';
 
-    settings["Site options"] = siteoptions.toString();
+    settings['Site options'] = siteoptions.toString();
 
-    settings["Config folder"] = configfolder;
-    settings["Config file"] = configfile;
+    settings['Config folder'] = configfolder;
+    settings['Config file'] = configfile;
 
-    settings["SASS compiler"] = sasscompiler;
-    settings["SASS_PATH (only for sass)"] =
-        sasspath.isNotEmpty ? _sasspath : "<not set>";
-    settings["Browser"] = browser;
+    settings['SASS compiler'] = sasscompiler;
+    settings['SASS_PATH (only for sass)'] =
+        sasspath.isNotEmpty ? _sasspath : '<not set>';
+    settings['Browser'] = browser;
 
-    settings["IP-Address"] = ip;
-    settings["Port"] = port;
-    settings["Document root"] = docroot;
+    settings['IP-Address'] = ip;
+    settings['Port'] = port;
+    settings['Document root'] = docroot;
 
-    settings["Additional watchfolder1"] =
-        watchfolder1.isNotEmpty ? watchfolder1 : "<not set>";
-    settings["Additional watchfolder2"] =
-        watchfolder1.isNotEmpty ? watchfolder2 : "<not set>";
-    settings["Additional watchfolder3"] =
-        watchfolder1.isNotEmpty ? watchfolder3 : "<not set>";
+    settings['Additional watchfolder1'] =
+        watchfolder1.isNotEmpty ? watchfolder1 : '<not set>';
+    settings['Additional watchfolder2'] =
+        watchfolder1.isNotEmpty ? watchfolder2 : '<not set>';
+    settings['Additional watchfolder3'] =
+        watchfolder1.isNotEmpty ? watchfolder3 : '<not set>';
 
     if (dirstoscan.isNotEmpty) {
-      settings["Dirs to scan"] = dirstoscan.join(", ");
+      settings['Dirs to scan'] = dirstoscan.join(', ');
     }
 
     return settings;
@@ -222,38 +222,38 @@ class Config {
 
     String prepareKey(final String key) {
       if (key.isNotEmpty) {
-        return "${key[0].toUpperCase()}${key.substring(1)}:"
+        return '${key[0].toUpperCase()}${key.substring(1)}:'
             .padRight(maxKeyLength + 1);
       } else {
-        // this is only the case if setting is "sass_path..."
+        // this is only the case if setting is 'sass_path...'
         return key.padRight(maxKeyLength + 1);
       }
     }
 
-    print("Settings:");
-    //print("    ${'Name'.padRight(maxKeyLeght)}  ${'Value'.padRight(25)} ${'Key (site.yaml)'}");
+    print('Settings:');
+    //print('    ${'Name'.padRight(maxKeyLeght)}  ${'Value'.padRight(25)} ${'Key (site.yaml)'}');
     settings.forEach((final String key, final value) {
-      if (key.toLowerCase().startsWith("sass_path") && sasspath.isNotEmpty) {
+      if (key.toLowerCase().startsWith('sass_path') && sasspath.isNotEmpty) {
         final segments = value.split(_SEARCH_PATH_SEPARATOR);
-        print("    ${prepareKey(key)} ${segments.first}");
+        print('    ${prepareKey(key)} ${segments.first}');
         segments.skip(1).forEach((final String path) {
-          print("    ${prepareKey('')} $path");
+          print('    ${prepareKey('')} $path');
         });
       } else {
-        print("    ${prepareKey(key)} ${value}");
+        print('    ${prepareKey(key)} ${value}');
       }
     });
 
     _commandmanager._commands
         .forEach((final String name, final Command command) {
-      print("    ${prepareKey(name)} ${command.exe}");
+      print('    ${prepareKey(name)} ${command.exe}');
     });
   }
 
   void printSiteKeys() {
-    print("Keys for ${configfile}:");
+    print('Keys for ${configfile}:');
     _settings.forEach((final String key, final dynamic value) {
-      print("    ${(key + ':').padRight(20)} $value");
+      print('    ${(key + ':').padRight(20)} $value');
     });
   }
 
@@ -299,7 +299,7 @@ class Config {
   }
 
   void _overwriteSettingsWithConfigFile() {
-    final file = File("${configfolder}/${configfile}");
+    final file = File('${configfolder}/${configfile}');
     if (!file.existsSync()) {
       return;
     }
@@ -307,12 +307,12 @@ class Config {
     _settings.keys.forEach((final String key) {
       if (map != null && map.containsKey(key)) {
         _settings[key] = map[key];
-        print("Found $key in $configfile: ${map[key]}");
+        print('Found $key in $configfile: ${map[key]}');
       }
     });
   }
 
-  /// Interprets the "sass_path" settings in site.yaml
+  /// Interprets the 'sass_path' settings in site.yaml
   String get _sasspath {
     // Can be a String or a YamlList
     final dynamic pathInSettings = _settings[Config._CONF_SASS_PATH];
@@ -325,22 +325,22 @@ class Config {
     final tempPathList = <String>[];
     if (pathInSettings is String) {
       // Config-Path can be separated by a |
-      tempPathList.addAll(pathInSettings.split("|"));
+      tempPathList.addAll(pathInSettings.split('|'));
     } else if (pathInSettings is yaml.YamlList) {
       pathInSettings.toList().forEach(
           (final dynamic element) => tempPathList.add(element.toString()));
     } else {
       _logger.warning(
-          "sass_path must be either a String or a YamlList but was ${pathInSettings.runtimeType}...");
+          'sass_path must be either a String or a YamlList but was ${pathInSettings.runtimeType}...');
     }
 
     final sasspath = <String>[];
     tempPathList.forEach((final String pathEntry) {
-      if (pathEntry.startsWith("package:")) {
+      if (pathEntry.startsWith('package:')) {
         final uri = Uri.parse(pathEntry);
         try {
           final package = _packages.resolvePackageUri(uri);
-          final packageUri = package.uri.toString().replaceFirst("file://", "");
+          final packageUri = package.uri.toString().replaceFirst('file://', '');
           sasspath.add(path.normalize(path.absolute(packageUri)));
         } catch (error) {
           _logger.shout(error.toString());

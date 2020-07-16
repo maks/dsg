@@ -11,14 +11,14 @@ analyzer:
 
 linter:
   rules:
-    always_put_control_body_on_new_line: true
-    curly_braces_in_flow_control_structures: true
-    unnecessary_new: true
-    avoid_relative_lib_imports: true
-    directives_ordering: true
-    file_names: true
-    prefer_collection_literals: true
-    prefer_final_fields: true
-    prefer_final_locals: true
-    annotate_overrides: true
-    prefer_single_quotes: false
+    - always_put_control_body_on_new_line
+    - curly_braces_in_flow_control_structures
+    - unnecessary_new
+    - avoid_relative_lib_imports
+    - directives_ordering
+    - file_names
+    - prefer_collection_literals
+    - prefer_single_quotes
+    - prefer_final_fields
+    - prefer_final_locals
+    - annotate_overrides
