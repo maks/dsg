@@ -18,31 +18,28 @@ typedef mustache.Template PartialsResolver(final String name);
  */
 TemplateRenderer renderTemplate =
     (final String source, final Map options, final PartialsResolver resolver) {
-  final mustache.Template template = new mustache.Template(source,
+  final mustache.Template template = mustache.Template(source,
       htmlEscapeValues: false, partialResolver: resolver, lenient: true);
 
   return template.renderString(options);
 };
 
 class Generator {
-  final Logger _logger = new Logger("dsg.Generator");
+  final Logger _logger = Logger("dsg.Generator");
 
   /// Mustache-Renderer strips out newlines
   static const String _NEWLINE_PROTECTOR = "@@@#@@@";
 
   /// Render and output your static site (WARNING: overwrites existing HTML files in output directory).
   void generate(final Config config) {
-    final Directory contentDir =
-        new Directory(path.absolute(config.contentfolder));
+    final Directory contentDir = Directory(path.absolute(config.contentfolder));
     final Directory templateDir =
-        new Directory(path.absolute(config.templatefolder));
-    final Directory outputDir =
-        new Directory(path.absolute(config.outputfolder));
-    final Directory dataDir = new Directory(path.absolute(config.datafolder));
+        Directory(path.absolute(config.templatefolder));
+    final Directory outputDir = Directory(path.absolute(config.outputfolder));
+    final Directory dataDir = Directory(path.absolute(config.datafolder));
     final Directory partialsDir =
-        new Directory(path.absolute(config.partialsfolder));
-    final Directory assetsDir =
-        new Directory(path.absolute(config.assetsfolder));
+        Directory(path.absolute(config.partialsfolder));
+    final Directory assetsDir = Directory(path.absolute(config.assetsfolder));
 
     Validate.isTrue(
         contentDir.existsSync(), "ContentDir ${contentDir.path} must exist!");
@@ -56,7 +53,7 @@ class Generator {
     final List<File> assets = _listAssetsFilesIn(assetsDir);
     final List<File> templates = _listTemplatesIn(templateDir);
     final List<File> dataFiles =
-        dataDir.existsSync() ? _listDataFilesIn(dataDir) : new List<File>();
+        dataDir.existsSync() ? _listDataFilesIn(dataDir) : List<File>();
 
     final Map dataMap = _getDataMap(dataFiles);
 
@@ -150,7 +147,7 @@ class Generator {
       final String outputFilename =
           "${path.basenameWithoutExtension(relativeFileName)}.${outputExtension}";
       final Directory outputPath = _createOutputPath(outputDir, relativePath);
-      final File outputFile = new File("${outputPath.path}/$outputFilename");
+      final File outputFile = File("${outputPath.path}/$outputFilename");
 
       outputFile.writeAsStringSync(content);
       _logger.info(
@@ -165,7 +162,7 @@ class Generator {
 
       final Directory outputPath = _createOutputPath(outputDir, relativePath);
       final File outputFile =
-          new File("${outputPath.path}/${path.basename(relativeFileName)}");
+          File("${outputPath.path}/${path.basename(relativeFileName)}");
       image.copySync(outputFile.path);
 
       _logger.info(
@@ -180,7 +177,7 @@ class Generator {
 
       final Directory outputPath = _createOutputPath(outputDir, relativePath);
       final File outputFile =
-          new File("${outputPath.path}/${path.basename(relativeFileName)}");
+          File("${outputPath.path}/${path.basename(relativeFileName)}");
       asset.copySync(outputFile.path);
 
       _logger.info(
@@ -206,7 +203,7 @@ class Generator {
       if (pageOptions[key] is String &&
           (pageOptions[key] as String).contains("->")) {
         final String partial =
-            (pageOptions[key] as String).replaceAll(new RegExp(r"[^>]*>"), "");
+            (pageOptions[key] as String).replaceAll(RegExp(r"[^>]*>"), "");
         pageOptions[key] = renderTemplate("{{>${partial}}}", pageOptions,
             _partialsResolver(partialsDir, isMarkdownSupported: useMarkdown));
       }
@@ -225,9 +222,9 @@ class Generator {
 
     mustache.Template resolver(final String name) {
       final File partialHtml =
-          new File("${partialsDir.path}/${name.replaceAll(".", "/")}.html");
+          File("${partialsDir.path}/${name.replaceAll(".", "/")}.html");
       final File partialMd =
-          new File("${partialsDir.path}/${name.replaceAll(".", "/")}.md");
+          File("${partialsDir.path}/${name.replaceAll(".", "/")}.md");
 
       String content = "Partial with name {{$name}} is not available";
       if (partialHtml.existsSync()) {
@@ -243,7 +240,7 @@ class Generator {
         }
       }
 
-      return new mustache.Template(content, name: "{{$name}}");
+      return mustache.Template(content, name: "{{$name}}");
     }
 
     return resolver;
@@ -253,7 +250,7 @@ class Generator {
       final Directory outputDir, final String relativePath) {
     Validate.notNull(outputDir);
 
-    final Directory outputPath = new Directory(
+    final Directory outputPath = Directory(
         "${outputDir.path}${relativePath.isNotEmpty ? "/" : ""}${relativePath}");
     if (!outputPath.existsSync()) {
       outputPath.createSync(recursive: true);
@@ -268,7 +265,7 @@ class Generator {
 
   List<File> _listContentFilesIn(final Directory contentDir) {
     if (!contentDir.existsSync()) {
-      return new List<File>();
+      return List<File>();
     }
 
     return contentDir
@@ -307,7 +304,7 @@ class Generator {
 
   List<File> _listAssetsFilesIn(final Directory contentDir) {
     if (!contentDir.existsSync()) {
-      return new List<File>();
+      return List<File>();
     }
 
     return contentDir
@@ -376,12 +373,12 @@ class Generator {
         .skip(1)
         .takeWhile((line) => !line.startsWith(yamlStartBlock))
         .toList();
-    final List<String> yamlBlock = new List<String>();
+    final List<String> yamlBlock = List<String>();
 
     switch (forExtension) {
       case "dart":
         lines.forEach((final String line) {
-          yamlBlock.add(line.replaceFirst(new RegExp(r"// "), ""));
+          yamlBlock.add(line.replaceFirst(RegExp(r"// "), ""));
         });
         break;
 
@@ -419,10 +416,10 @@ class Generator {
     //_logger.info(pageOptions.toString());
 
     /// See [DateFormat](https://api.dartlang.org/docs/channels/stable/latest/intl/DateFormat.html) for formatting options
-    var date_format = new DateFormat(defaultDateFormat);
+    var date_format = DateFormat(defaultDateFormat);
 
     if (pageOptions.containsKey('date_format')) {
-      var page_date_format = new DateFormat(pageOptions['date_format']);
+      var page_date_format = DateFormat(pageOptions['date_format']);
       pageOptions['_date'] = page_date_format.format(file.lastModifiedSync());
     } else {
       pageOptions['_date'] = date_format.format(file.lastModifiedSync());
@@ -432,7 +429,7 @@ class Generator {
   }
 
   Map _getDataMap(final List<File> dataFiles) {
-    final Map<String, dynamic> dataMap = new Map<String, dynamic>();
+    final Map<String, dynamic> dataMap = Map<String, dynamic>();
 
     dataFiles.forEach((final File file) {
       if (file.existsSync()) {
@@ -476,9 +473,9 @@ class Generator {
     }
 
     final String pathWithoutExtension = path.withoutExtension(relativeFileName);
-    // final String portablePath = pathWithoutExtension.replaceAll(new RegExp("(/|\\\\\)"),":");
+    // final String portablePath = pathWithoutExtension.replaceAll( RegExp("(/|\\\\\)"),":");
     final String pageIndicator =
-        pathWithoutExtension.replaceAll(new RegExp("(/|\\\\\)"), "_");
+        pathWithoutExtension.replaceAll(RegExp("(/|\\\\\)"), "_");
     pageOptions["_page"] = {
       "filename": pathWithoutExtension,
       "pageindicator": pageIndicator,
@@ -547,14 +544,14 @@ class Generator {
 //     */
 //    String _removeYamlBlock(String fileContent,final Config config) {
 //
-//        fileContent = fileContent.replaceFirst(new RegExp("(?:.|\n)*${config.yamldelimeter}(?:\r\n|\n)",multiLine: true),"");
+//        fileContent = fileContent.replaceFirst( RegExp("(?:.|\n)*${config.yamldelimeter}(?:\r\n|\n)",multiLine: true),"");
 //
 //        /// if there is something like ~~~ (xtreme-sample)
-//        fileContent = fileContent.replaceFirst(new RegExp("^${config.yamldelimeter}\$"),"");
+//        fileContent = fileContent.replaceFirst( RegExp("^${config.yamldelimeter}\$"),"");
 //
 //        /// Replace all newlines with some silly characters to protect the newlines because
 //        /// Mustache-Renderer strips them
-//        fileContent = fileContent.replaceAll(new RegExp("\n",multiLine: true),_NEWLINE_PROTECTOR);
+//        fileContent = fileContent.replaceAll( RegExp("\n",multiLine: true),_NEWLINE_PROTECTOR);
 //
 //        return fileContent;
 //    }
@@ -582,8 +579,7 @@ class Generator {
           _showMap(value as Map<String, dynamic>, nestingLevel + 1);
         } else {
           String valueAsString = value.toString().replaceAll(
-              new RegExp("(\n|\r|\\s{2,}|${_NEWLINE_PROTECTOR})",
-                  multiLine: true),
+              RegExp("(\n|\r|\\s{2,}|${_NEWLINE_PROTECTOR})", multiLine: true),
               "");
 
           valueAsString =

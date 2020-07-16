@@ -11,12 +11,21 @@ Includes support for:
 
 *think: Jekyll for Dart*
 
+## Use as an executable
+
+You can either install dsg with pub:
+```
+pub global activate dsg
+```
+
+or you can just download the self-contained executable for your platform from the [Github repo](https://github.com/maks/dsg/actions).
+
 ## Example
 
-   - Install DSG `pub global activate dsg`
+   - Install DSG (see above)
    - Clone the example from `https://github.com/maks/dsg/tree/master/samples/simple`
-   - run `dsg -w` 
-   - open another console window and run `pub run build_runner serve --delete-conflicting-outputs --live-reload`
+   - cd into the local `simple` git repo
+   - run `dsg -x`
 
 Play with the sample files...
      
@@ -30,7 +39,7 @@ Generate a self-signed certificate, name it dart.cert and dart.key, place it und
 and run `dsg -x --usesec` and - voila. That's it!
 
 #### Support for SASS_PATH
-[Understanding and Using Sass Load Paths](http://technology.customink.com/blog/2014/10/09/understanding-and-using-sass-load-paths/)   
+[Understanding and Using Sass Load Paths](https://technology.customink.com/blog/2014/10/09/understanding-and-using-sass-load-paths/)   
 
 These settings in your .dsg/site.yaml ()
 ```yaml
@@ -40,7 +49,7 @@ These settings in your .dsg/site.yaml ()
       - "package:mdl"
 ```
 
-generate generate the following SASS_PATH:
+generate the following SASS_PATH:
 ```bash
 dsg -s
 
@@ -54,7 +63,7 @@ dsg -s
 
 ```
 As you can see the first path is resolved to .pub-cache, the second path
-is resolve to my local working dir where the mdl-library resides
+is resolve to a local working dir where the mdl-library resides
 
 Now you can define your SASS-Import as follows:
 ```scss
@@ -63,17 +72,17 @@ Now you can define your SASS-Import as follows:
 ```
 
 ### What it does
-DSG is a static site generator in [Dart](https://www.dartlang.org/), webserver included.
-With extra assets-folder and partials-support.  
+DSG is a static site generator in [Dart](https://www.dartlang.org/), with a webserver included.
+It supports extra assets-folder and template partials.  
 You can write your pages in HTML or [CommonMark aka "Markdown"](https://commonmark.org/) is supported.
   
-A webserver for a quick review is included. On Mac you also get automatic page refresh. On other 
+A webserver for a quick previews is included. On Mac you also get automatic page refresh. On other 
 platforms you could try [LivePage](https://chrome.google.com/webstore/detail/livepage/pilnojpmdoofaelbinaeodfpjheijkbh) 
 chrome extension for maximum productivity.  
 
 [Here](https://github.com/maks/dsg/tree/master/sample/simple) you can see a typical site structure.
 
-See [manichord.com](http://manichord.com) for a site built entirely with DSG.   
+See [manichord.com](https://manichord.com) for a site built entirely with DSG.   
 
 Check out the [sample!](https://github.com/maks/dsg/tree/master/samples/simple).
 
@@ -177,13 +186,12 @@ Here is a sample how to use such data:
 * .ttf
 * .pdf
 
-
 **.dsg/html/_templates**: The directory containing your HTML+Mustache templates.
 
 **web**: Following Dart conventions - this is your default **output** directory.
 
 ## site.yaml
-**Optional** [YAML](http://rhnh.net/2011/01/31/yaml-tutorial) file that stores your global values and config options.
+**Optional** [YAML](https://rhnh.net/2011/01/31/yaml-tutorial) file that stores your global values and config options.
 Values set here can be accessed from all templates and markdown files.
 
 ```
@@ -221,7 +229,7 @@ Supported vars:
 **DSG** lets you use [CommonMark aka "Markdown"](https://commonmark.org/) to write your site content.
 
 At the beginning of each markdown file, you
-have the option to use a [YAML](http://rhnh.net/2011/01/31/yaml-tutorial) "front-matter" block to define custom values that you can inject into your templates. Example:
+have the option to use a [YAML](https://rhnh.net/2011/01/31/yaml-tutorial) "front-matter" block to define custom values that you can inject into your templates. Example:
 
     ~~~
     title: A Blog Post
@@ -236,7 +244,7 @@ have the option to use a [YAML](http://rhnh.net/2011/01/31/yaml-tutorial) "front
     Normal Markdown content here...
 
 As you can see, a line of tildes (`~`) is used to delimit your YAML block (marking start and end lines). You can access/inject your values into
-your pages using [mustache template syntax](http://mustache.github.io/mustache.5.html). You can do this either inside your dedicated HTML/mustache templates:
+your pages using [mustache template syntax](https://mustache.github.io/mustache.5.html). You can do this either inside your dedicated HTML/mustache templates:
 
     <ul>
       {{#tags}}
@@ -293,12 +301,12 @@ dart: ->usage.badge.dart
 
 ## SASS
 If DSG finds a .scss file in your output dir (web) it compiles it to the corresponding .css file.      
-Install instruction for SASS can be found [here](http://sass-lang.com/install)  
+Install instruction for SASS can be found [here](https://sass-lang.com/install)  
 In short it's `gem install sass` and `gem install sassc`  
 
 You can turn off SASS either with `--no-usesass` or with the appropriate setting in site.yaml 
 
-Or - event better, **install sassc**: `brew install sassc`
+Or **install sassc**, eg on MacOS: `brew install sassc`
 
 ## Autoprefixer
 After compiling .SCSS to .CSS DSG calls autoprefixer <yourcss>  
@@ -367,15 +375,15 @@ Sample:
 
 Go to your project root (this is where your pubspec.yaml is) and type:
 
-    dsg -i
+    `dsg -i`
     
 This creates a basic file structure for you.     
 
 Now type
 
-    dsg -w --serve
+    `dsg -x`
     
-This servers your files under http://localhost:8000/    
+This serves your files under `https://localhost:8000/`    
         
 If you are using Chromium on Mac you will get a automatic page refresh for free!
  
@@ -383,7 +391,7 @@ If you are using Chromium on Mac you will get a automatic page refresh for free!
 - Just serve a local dir on port 8000 without generating something:  
     `dsg --serve --docroot .`
     
-- DSG observes automatically it's basefolders like content, web aso. but if
+- DSG observes automatically it's basefolders like `_content`, but if
     you want additional folders that should be observed so that dsg automatically regenerates it's
     file - set watchfolder[1-3] in you site.yaml
     
@@ -399,9 +407,11 @@ If you are using Chromium on Mac you will get a automatic page refresh for free!
  
 
 ### Features and bugs
-Please file feature requests and bugs at the [issue tracker](https://github.com/maks/dsg/issues).
+
+Please file feature requests and bug reports in the [issue tracker](https://github.com/maks/dsg/issues).
 
 ### Thanks
+
 I want to thank **Michael Mitterer** for his [SiteGen](https://github.com/MikeMitterer/dart-sitegen) 
 package that I used as a starting point for **DSG**. 
 
@@ -416,7 +426,7 @@ package that I used as a starting point for **DSG**.
     you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
 
-       http://www.apache.org/licenses/LICENSE-2.0
+       https://www.apache.org/licenses/LICENSE-2.0
 
     Unless required by applicable law or agreed to in writing,
     software distributed under the License is distributed on an

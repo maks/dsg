@@ -1,7 +1,7 @@
 part of dsg;
 
 class Application {
-  final Logger _logger = new Logger("dsg.Application");
+  final Logger _logger = Logger("dsg.Application");
 
   /// Commandline options
   final Options options;
@@ -17,13 +17,13 @@ class Application {
   /// {timerWatch} waits 500ms until all watched folders and files updated
   Timer timerWatch = null;
 
-  Application() : options = new Options();
+  Application() : options = Options();
 
   Future run(final List<String> args) async {
     try {
       final CommandManager cm = await CommandManager.getInstance();
       final ArgResults argResults = options.parse(args);
-      final Config config = new Config(argResults, cm);
+      final Config config = Config(argResults, cm);
 
       _configLogging(config.loglevel);
 
@@ -54,14 +54,14 @@ class Application {
 
       if (argResults.wasParsed(Options._ARG_INIT)) {
         foundOptionToWorkWith = true;
-        final Init init = new Init();
+        final Init init = Init();
         init.createDirs(config).then((_) => init.createFiles(config));
         return 0;
       }
 
       if (argResults.wasParsed(Options._ARG_GENERATE)) {
         foundOptionToWorkWith = true;
-        new Generator().generate(config);
+        Generator().generate(config);
       }
 
       if (argResults.wasParsed(Options._ARG_GENERATE_CSS)) {
@@ -89,7 +89,7 @@ class Application {
             watch(config.assetsfolder, config);
           }
 
-          new Generator().generate(config);
+          Generator().generate(config);
         }
         watchScss(config.outputfolder, config);
         // watchToRefresh(config.outputfolder, config);
@@ -134,24 +134,24 @@ class Application {
     VirtualDirectory virtDir;
     void _directoryHandler(final Directory dir, final HttpRequest request) {
       _logger.info(dir);
-      var indexUri = new Uri.file(dir.path).resolve('index.html');
-      virtDir.serveFile(new File(indexUri.toFilePath()), request);
+      var indexUri = Uri.file(dir.path).resolve('index.html');
+      virtDir.serveFile(File(indexUri.toFilePath()), request);
     }
 
-    virtDir = new VirtualDirectory(MY_HTTP_ROOT_PATH)
+    virtDir = VirtualDirectory(MY_HTTP_ROOT_PATH)
       ..allowDirectoryListing = true
       ..followLinks = true
       ..jailRoot = false;
     virtDir.directoryHandler = _directoryHandler;
 
-    final Packages packages = new Packages();
+    final Packages packages = Packages();
 
     // if hasPackages is false then we are not in a Dart-Project
     final bool hasPackages = packages.hasPackages;
 
     Future<HttpServer> connect;
     if (config.usesecureconnection) {
-      final SecurityContext context = new SecurityContext();
+      final SecurityContext context = SecurityContext();
       context.useCertificateChain(config.certfile);
       context.usePrivateKey(config.keyfile);
       connect = HttpServer.bindSecure(ip, int.parse(port), context);
@@ -167,18 +167,18 @@ class Application {
         server.listen((final HttpRequest request) {
           if (request.uri.path.startsWith("/packages") && hasPackages) {
             final List<String> parts =
-                request.uri.path.split(new RegExp(r"(?:/|\\)"));
+                request.uri.path.split(RegExp(r"(?:/|\\)"));
             final String path = parts.sublist(3).join("/");
             final String packageName = parts[2];
 
             final Package package =
                 packages.resolvePackageUri(Uri.parse("package:${packageName}"));
-            final String rewritten = "${package.lib.path}/$path".replaceFirst(
-                new RegExp(r"^.*pub\.dartlang\.org/"), "package:");
+            final String rewritten = "${package.lib.path}/$path"
+                .replaceFirst(RegExp(r"^.*pub\.dartlang\.org/"), "package:");
 
             _logger.info(
                 "${request.connectionInfo.remoteAddress.address}:${request.connectionInfo.localPort} - ${request.method} [Rewritten] ${rewritten}");
-            virtDir.serveFile(new File("${package.lib.path}/$path"), request);
+            virtDir.serveFile(File("${package.lib.path}/$path"), request);
           } else {
             _logger.info(
                 "${request.connectionInfo.remoteAddress.address}:${request.connectionInfo.localPort} - ${request.method} ${request.uri}");
@@ -197,7 +197,7 @@ class Application {
 
     _logger.info('Observing (watch) $folder...');
 
-    final Directory srcDir = new Directory(folder);
+    final Directory srcDir = Directory(folder);
 
     var watcher = DirectoryWatcher(srcDir.path);
     watcher.events
@@ -218,7 +218,7 @@ class Application {
     Validate.notNull(config);
 
     _logger.fine('Observing $folder (SCSS)... ');
-    final Directory dir = new Directory(folder);
+    final Directory dir = Directory(folder);
     final List<File> scssFiles = _listSCSSFilesIn(dir);
 
     if (scssFiles.length == 0) {
@@ -239,7 +239,7 @@ class Application {
           //_logger.info("Scss: ${scssFile}, CSS: ${cssFile}");
 
           if (timerWatchCss == null) {
-            timerWatchCss = new Timer(new Duration(milliseconds: 500), () {
+            timerWatchCss = Timer(Duration(milliseconds: 500), () {
               _compileSCSSFile(folder, config);
               timerWatchCss = null;
             });
@@ -262,8 +262,8 @@ class Application {
 
     _logger.fine('Observing $cssFolder (SCSS)... ');
 
-    final Directory dirToCheck = new Directory(additionalWatchFolder);
-    final Directory dir = new Directory(cssFolder);
+    final Directory dirToCheck = Directory(additionalWatchFolder);
+    final Directory dir = Directory(cssFolder);
     final List<File> scssFiles = _listSCSSFilesIn(dir);
 
     if (scssFiles.length == 0) {
@@ -283,7 +283,7 @@ class Application {
         // _logger.info("Scss: ${scssFile}, CSS: ${cssFile}");
 
         if (timerWatchCss == null) {
-          timerWatchCss = Timer(new Duration(milliseconds: 500), () {
+          timerWatchCss = Timer(Duration(milliseconds: 500), () {
             _compileSCSSFile(cssFolder, config);
             timerWatchCss = null;
           });
@@ -346,7 +346,7 @@ class Application {
     Validate.notNull(config);
 
     _logger.fine('Observing: (_compileSCSSFile) $folder (SCSS)... ');
-    final Directory dir = new Directory(folder);
+    final Directory dir = Directory(folder);
     final List<File> scssFiles = _listSCSSFilesIn(dir);
 
     if (scssFiles.length == 0) {
@@ -358,8 +358,7 @@ class Application {
     File _mainScssFile(final List<File> scssFiles) {
       final File mainScss = scssFiles.firstWhere((final File file) {
         final String pureFilename = path.basename(file.path);
-        return pureFilename
-            .startsWith(new RegExp(r"[a-z]", caseSensitive: false));
+        return pureFilename.startsWith(RegExp(r"[a-z]", caseSensitive: false));
       });
       return mainScss;
     }
@@ -376,7 +375,7 @@ class Application {
 
   bool _isFolderAvailable(final String folder) {
     Validate.notBlank(folder);
-    final Directory dir = new Directory(folder);
+    final Directory dir = Directory(folder);
     return dir.existsSync();
   }
 
@@ -393,7 +392,7 @@ class Application {
     }
 
     final String compiler = config.sasscompiler;
-    final Map<String, String> environment = new Map<String, String>();
+    final Map<String, String> environment = Map<String, String>();
 
     if (config.sasspath.isNotEmpty) {
       // only sass supports SASS_PATH (not sassc)
@@ -487,6 +486,6 @@ class Application {
     }
 
     Logger.root.onRecord
-        .listen(new LogPrintHandler(transformer: transformerMessageOnly));
+        .listen(LogPrintHandler(transformer: transformerMessageOnly));
   }
 }

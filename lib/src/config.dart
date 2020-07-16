@@ -5,7 +5,7 @@ part of dsg;
  * Most of these configs can be overwritten by commandline args.
  */
 class Config {
-  final Logger _logger = new Logger("dsg.Config");
+  final Logger _logger = Logger("dsg.Config");
 
   static const String _CONFIG_FOLDER = ".dsg";
 
@@ -40,8 +40,8 @@ class Config {
   static final String _SEARCH_PATH_SEPARATOR = Platform.isWindows ? ";" : ":";
 
   final ArgResults _argResults;
-  final Map<String, dynamic> _settings = new Map<String, dynamic>();
-  final Packages _packages = new Packages();
+  final Map<String, dynamic> _settings = Map<String, dynamic>();
+  final Packages _packages = Packages();
   final CommandManager _commandmanager;
 
   Config(this._argResults, this._commandmanager) {
@@ -151,7 +151,7 @@ class Config {
   String get watchfolder3 => _settings[Config._CONF_ADDITIONAL_WATCH_FOLDER3];
 
   Map<String, String> get settings {
-    final Map<String, String> settings = new Map<String, String>();
+    final Map<String, String> settings = Map<String, String>();
 
     settings["loglevel"] = loglevel;
 
@@ -295,7 +295,7 @@ class Config {
   }
 
   void _overwriteSettingsWithConfigFile() {
-    final File file = new File("${configfolder}/${configfile}");
+    final File file = File("${configfolder}/${configfile}");
     if (!file.existsSync()) {
       return;
     }
@@ -318,7 +318,7 @@ class Config {
       return pathInSettings;
     }
 
-    final List<String> tempPathList = new List<String>();
+    final List<String> tempPathList = List<String>();
     if (pathInSettings is String) {
       // Config-Path can be separated by a |
       tempPathList.addAll(pathInSettings.split("|"));
@@ -331,7 +331,7 @@ class Config {
           "sass_path must be either a String or a YamlList but was ${pathInSettings.runtimeType}...");
     }
 
-    final List<String> sasspath = new List<String>();
+    final List<String> sasspath = List<String>();
     tempPathList.forEach((final String pathEntry) {
       if (pathEntry.startsWith("package:")) {
         final Uri uri = Uri.parse(pathEntry);

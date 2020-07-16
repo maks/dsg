@@ -5,7 +5,7 @@ part of dsg;
  * This means - creates _templates folder, _content folder aso.
  */
 class Init {
-  final Logger _logger = new Logger("dsg.Init");
+  final Logger _logger = Logger("dsg.Init");
 
   static const String _STYLES_FOLDER = "styles";
   static const String _STYLES_FILE = "main.scss";
@@ -36,7 +36,7 @@ class Init {
   Future _createDir(final String dirname) async {
     Validate.notBlank(dirname);
 
-    final Directory dir = new Directory(dirname);
+    final Directory dir = Directory(dirname);
     if (!await dir.exists()) {
       await dir.create(recursive: true);
       _logger.info("${dir.path} created...");
@@ -46,7 +46,7 @@ class Init {
   Future _createSiteYaml(final Config config) async {
     Validate.notNull(config);
 
-    final File file = new File("${config.configfolder}/${config.configfile}");
+    final File file = File("${config.configfolder}/${config.configfile}");
     if (!await file.exists()) {
       final String content =
           "site_options:\n  generator: DSG\n  site_name: Sample";
@@ -59,7 +59,7 @@ class Init {
     Validate.notNull(config);
 
     final File file =
-        new File(("${config.templatefolder}/${config.defaulttemplate}"));
+        File(("${config.templatefolder}/${config.defaulttemplate}"));
     if (!await file.exists()) {
       final String content = """
                 <!DOCTYPE html>
@@ -80,7 +80,7 @@ class Init {
                 </html>
             """
           .trim()
-          .replaceAll(new RegExp(r"^\s{16}", multiLine: true),
+          .replaceAll(RegExp(r"^\s{16}", multiLine: true),
               ""); // 16 is the number of spaces for the first indention
       await file.writeAsString(content);
       _logger.info("${file.path} created...");
@@ -90,7 +90,7 @@ class Init {
   Future _createIndexHTML(final Config config) async {
     Validate.notNull(config);
 
-    final File file = new File("${config.contentfolder}/index.html");
+    final File file = File("${config.contentfolder}/index.html");
     if (!await file.exists()) {
       final String content = """
                 title: My index page
@@ -100,7 +100,7 @@ class Init {
                 </section>
                 """
           .trim()
-          .replaceAll(new RegExp(r"^\s{16}", multiLine: true), "");
+          .replaceAll(RegExp(r"^\s{16}", multiLine: true), "");
       await file.writeAsString(content);
       _logger.info("${file.path} created...");
     }
@@ -110,7 +110,7 @@ class Init {
     Validate.notNull(config);
 
     final File file =
-        new File("${config.contentfolder}/$_STYLES_FOLDER/$_STYLES_FILE");
+        File("${config.contentfolder}/$_STYLES_FOLDER/$_STYLES_FILE");
     if (!await file.exists()) {
       final String content = """
                 body {
@@ -122,7 +122,7 @@ class Init {
                 }
                 """
           .trim()
-          .replaceAll(new RegExp(r"^\s{16}", multiLine: true), "");
+          .replaceAll(RegExp(r"^\s{16}", multiLine: true), "");
       await file.writeAsString(content);
       _logger.info("${file.path} created...");
     }
