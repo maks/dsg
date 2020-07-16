@@ -1,0 +1,24 @@
+include: package:pedantic/analysis_options.yaml
+
+analyzer:
+  strong-mode:
+    implicit-casts: false
+    implicit-dynamic: false
+  exclude:
+    - lib/**/*.g.dart
+    - lib/**/*.freezed.dart
+    - tool/*.dart
+
+linter:
+  rules:
+    always_put_control_body_on_new_line: true
+    curly_braces_in_flow_control_structures: true
+    unnecessary_new: true
+    avoid_relative_lib_imports: true
+    directives_ordering: true
+    file_names: true
+    prefer_collection_literals: true
+    prefer_final_fields: true
+    prefer_final_locals: true
+    annotate_overrides: true
+    prefer_single_quotes: false

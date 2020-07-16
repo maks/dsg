@@ -1,17 +1,17 @@
 import 'package:grinder/grinder.dart';
 
-main(final List<String> args) => grind(args);
+void main(final List<String> args) => grind(args);
 
 @Task()
 @Depends(test, buildSamples)
-build() {}
+void build() {}
 
 @Task()
-clean() => defaultClean();
+void clean() => defaultClean();
 
 @Task()
 @Depends(analyze)
-buildSamples() async {
+void buildSamples() async {
   // Sitegen Sample
   await runAsync("buildSamples", arguments: ["--sitegen"]);
 
@@ -27,7 +27,7 @@ buildSamples() async {
 
 @Task()
 @Depends(analyze)
-test() {
+void test() {
   // TestRunner().testAsync(files: "test/unit");
   // TestRunner().testAsync(files: "test/integration");
 
@@ -37,15 +37,15 @@ test() {
 }
 
 @Task()
-analyze() {
-  final List<String> libs = ["lib/sitegen.dart", "bin/sitegen.dart"];
+void analyze() {
+  final libs = ["lib/sitegen.dart", "bin/sitegen.dart"];
 
   libs.forEach((final String lib) => Analyzer.analyze(lib));
   // Analyzer.analyze("test");
 }
 
 @Task('Deploy built app.')
-deploy() {
+void deploy() {
   run(sdkBin('pub'),
       arguments: ["global", "activate", "--source", "path", "."]);
 }
