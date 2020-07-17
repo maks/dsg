@@ -220,7 +220,7 @@ Supported vars:
 - output_dir: web
 - workspace: .
 - date_format: dd.MM.yyyy
-- yaml_delimeter: ~~~
+- yaml_delimeter: ---
 - use_markdown: true
 - default_template: default.html
 - sasscompiler: sassc
@@ -236,7 +236,7 @@ Supported vars:
 At the beginning of each markdown file, you
 have the option to use a [YAML](https://rhnh.net/2011/01/31/yaml-tutorial) "front-matter" block to define custom values that you can inject into your templates. Example:
 
-    ~~~
+    ---
     title: A Blog Post
     published: 01/01/2014
     category: example
@@ -244,7 +244,7 @@ have the option to use a [YAML](https://rhnh.net/2011/01/31/yaml-tutorial) "fron
         - StillShot
         - Rants
         - Etc.
-    ~~~
+    ---
     {{title}}
     Normal Markdown content here...
 
@@ -298,10 +298,10 @@ A partial can be either a .md or a .html file
 
 You can also use partials in the files yaml block:
 ```yaml
-~~~
+---
 template: default.html    
 dart: ->usage.badge.dart  
-~~~  
+---  
 ```
 
 ## SASS

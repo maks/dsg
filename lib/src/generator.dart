@@ -88,7 +88,7 @@ class Generator {
           _resolvePartialsInYamlBlock(
               partialsDir, pageOptions, config.usemarkdown);
 
-          // +1 for the YAML-Block-Delimiter ('~~~') line
+          // +1 for the YAML-Block-Delimiter ('---') line
           lines.removeRange(0, yamlBlock.length + 1);
         } else {
           lines.removeRange(0, 1);
@@ -189,7 +189,7 @@ class Generator {
   /// Example: yaml-block in file
   /// ...
   /// dart: ->usage.badge.dart
-  /// ~~~
+  /// ---
   ///
   /// dart is the page-var.
   /// usage.badge.dart is the partial.
@@ -530,23 +530,6 @@ class Generator {
 
     return html;
   }
-
-//    /**
-//     * Removes everything before ~~~
-//     */
-//    String _removeYamlBlock(String fileContent,final Config config) {
-//
-//        fileContent = fileContent.replaceFirst( RegExp("(?:.|\n)*${config.yamldelimeter}(?:\r\n|\n)",multiLine: true),"");
-//
-//        /// if there is something like ~~~ (xtreme-sample)
-//        fileContent = fileContent.replaceFirst( RegExp("^${config.yamldelimeter}\$"),"");
-//
-//        /// Replace all newlines with some silly characters to protect the newlines because
-//        /// Mustache-Renderer strips them
-//        fileContent = fileContent.replaceAll( RegExp("\n",multiLine: true),_NEWLINE_PROTECTOR);
-//
-//        return fileContent;
-//    }
 
   /// Shows all the available vars for the current page
   ///
