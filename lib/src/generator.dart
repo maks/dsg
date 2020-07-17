@@ -292,6 +292,8 @@ class Generator {
                 file.path.endsWith('.gif') ||
                 file.path.endsWith('.woff') ||
                 file.path.endsWith('.tff') ||
+                file.path.endsWith('.ico') ||
+                file.path.endsWith('.txt') ||
                 file.path.endsWith('.pdf')) &&
             !file.path.contains('packages'))
         .map((final FileSystemEntity entity) => entity as File)

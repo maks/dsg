@@ -1,5 +1,3 @@
-#template_dir: ../_templates
-
 # Usage: _site.<var name>
 # Sample: _site.site_name
 site_options:
@@ -7,11 +5,14 @@ site_options:
   site_name: MDL/Dart + SiteGen Sample
   author: Mike Mitterer
 
-#browser: Chrome
-#browser: Dartium
+yaml_delimeter: ---
 
 # Use secure connection
-usesec: true
+#usesec: true
 
 cert_file: etc/dart.crt
 key_file: etc/dart.key
+
+# Disables sass and autprefixer 
+usesass: false
+autoprefixer: false

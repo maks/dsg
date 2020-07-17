@@ -23,7 +23,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description" content="A front-end template that helps you build fast, modern mobile web apps.">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>XTreme | MDL/Dart + SiteGen Sample</title>
+    <title>main | MDL/Dart + SiteGen Sample</title>
 
     <!-- Add to homescreen for Chrome on Android -->
     <meta name="mobile-web-app-capable" content="yes">
@@ -50,9 +50,9 @@
           rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
-    <link rel="stylesheet" href="../assets/styles/styles.css">
+    <link rel="stylesheet" href="assets/styles/styles.css">
 </head>
-<body class="mdl-demo mdl-color--grey-100 mdl-color-text--grey-700 mdl-base mdl-upgrading about_index">
+<body class="mdl-demo mdl-color--grey-100 mdl-color-text--grey-700 mdl-base mdl-upgrading main">
 <div class="mdl-splashscreen mdl-color--primary"><div class="spinner"><div class="dot1 mdl-color--white"></div><div class="dot2 mdl-color--accent"></div></div></div>
 <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header mdl-color--grey-300">
     <!-- Usage of "partials" -->
@@ -60,32 +60,45 @@
         <div class="mdl-layout--large-screen-only mdl-layout__header-row">
         </div>
         <div class="mdl-layout--large-screen-only mdl-layout__header-row">
-            <h3>XTreme</h3>
+            <h3>main</h3>
         </div>
         <div class="tab-bar mdl-js-ripple-effect mdl-color--primary-dark">
-            <a href="../index.html" class="mdl-layout__tab ">
+            <a href="index.html" class="mdl-layout__tab ">
                 Overview
             </a>
-            <a href="../features.html" class="mdl-layout__tab ">
+            <a href="features.html" class="mdl-layout__tab ">
                 Features
             </a>
-            <a href="../markdown.html" class="mdl-layout__tab ">
+            <a href="markdown.html" class="mdl-layout__tab ">
                 Markdown
             </a>
-            <a href="../technology.html" class="mdl-layout__tab ">
+            <a href="technology.html" class="mdl-layout__tab ">
                 Technology
             </a>
-            <a href="../about/index.html" class="mdl-layout__tab is-active">
+            <a href="about/index.html" class="mdl-layout__tab ">
                 About
             </a>
         </div>
     </header>    <main class="mdl-layout__content">
         <section class="main-section">
             <!-- '_content' contains the contents of the markdown file (minus the yaml variables in the header) -->
-            ++ ---
-<div class="mdl-panel mdl-shadow--2dp">
-    I live in a subfolder <strong>cool</strong>
-</div> ==
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+import 'package:console_log_handler/console_log_handler.dart';
+
+import 'package:m4d_core/m4d_ioc.dart' as ioc;
+import "package:m4d_components/m4d_components.dart";
+
+final Logger _logger = Logger('I am your logger');
+
+main() async {
+  configLogging();
+
+  ioc.Container.bindModules([CoreComponentsModule()]);
+
+  await componentFactory().upgrade().then((_) {
+    _logger.info("Upgraded!");
+  });
+}
         </section>
         <footer class="mdl-mega-footer">
             <div class="mdl-mega-footer--middle-section">
@@ -140,13 +153,13 @@
                 <ul class="mdl-mega-footer--link-list">
                     <li><a href="https://developers.google.com/web/starter-kit/">Web Starter Kit</a></li>
                     <li><a href="#">Help</a></li>
-                    <li><a href="#">Privacy and Terms - ../</a></li>
+                    <li><a href="#">Privacy and Terms - </a></li>
                 </ul>
             </div>
         </footer>
     </main>
 </div>
 
-<script defer src="../main.dart.js"></script>
+<script defer src="main.dart.js"></script>
 </body>
 </html>

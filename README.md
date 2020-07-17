@@ -190,6 +190,11 @@ Here is a sample how to use such data:
 
 **web**: Following Dart conventions - this is your default **output** directory.
 
+### Top-level files
+
+Sometimes you will need to place specific files in the top level of your website, for example `favicon.ico` or `robots.txt`. These files can simply be placed in the `.dsg/html/_content` folder and will then be copied across to the `web` output folder. See the sample website in `example/simple` folder of this git repo for an example.
+
+
 ## site.yaml
 **Optional** [YAML](https://rhnh.net/2011/01/31/yaml-tutorial) file that stores your global values and config options.
 Values set here can be accessed from all templates and markdown files.
