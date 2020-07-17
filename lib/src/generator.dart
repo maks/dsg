@@ -62,45 +62,67 @@ class Generator {
           path.extension(relativeFileName).replaceFirst('.', '').toLowerCase();
 
       _logger.fine('\nFile: ${relativeFileName}, Path: $relativePath');
-      final lines = file.readAsLinesSync();
+      //final lines = file.readAsLinesSync();
+
+      final fileContents = file.readAsStringSync();
+      fm.FrontMatterDocument fmDocument;
+      try {
+        fmDocument = fm.parse(fileContents);
+      } catch (e) {
+        _logger.severe('Invalid Content File: ${file.path}');
+        return;
+      }
       var pageOptions = <String, dynamic>{};
 
-      final hasYamlBlock =
-          _hasYamlBlock(config.yamldelimeter, lines, extension);
-      if (hasYamlBlock) {
-        final yamlBlock =
-            _extractYamlBlockFrom(config.yamldelimeter, lines, extension);
-        if (yamlBlock.isNotEmpty) {
-          final block = yamlBlock.join('\n');
-          final ym = yaml.loadYaml(block) as yaml.YamlMap;
-
-          pageOptions
-              .addAll(ym.map<String, dynamic>((dynamic key, dynamic value) {
-            if (value is yaml.YamlList) {
-              return MapEntry<String, yaml.YamlList>(key.toString(), value);
-            }
-            if (value is yaml.YamlMap) {
-              return MapEntry<String, yaml.YamlMap>(key.toString(), value);
-            }
-            return MapEntry<String, String>(key.toString(), value.toString());
-          }));
-
-          _resolvePartialsInYamlBlock(
-              partialsDir, pageOptions, config.usemarkdown);
-
-          // +1 for the YAML-Block-Delimiter ('~~~') line
-          lines.removeRange(0, yamlBlock.length + 1);
-        } else {
-          lines.removeRange(0, 1);
-        }
+      if (fmDocument.data != null) {
+        pageOptions.addAll(
+            fmDocument.data.map<String, dynamic>((dynamic key, dynamic value) {
+          if (value is yaml.YamlList) {
+            return MapEntry<String, yaml.YamlList>(key.toString(), value);
+          }
+          if (value is yaml.YamlMap) {
+            return MapEntry<String, yaml.YamlMap>(key.toString(), value);
+          }
+          return MapEntry<String, String>(key.toString(), value.toString());
+        }));
       }
+
+      // final hasYamlBlock =
+      //     _hasYamlBlock(config.yamldelimeter, lines, extension);
+      // if (hasYamlBlock) {
+      //   final yamlBlock =
+      //       _extractYamlBlockFrom(config.yamldelimeter, lines, extension);
+      //   if (yamlBlock.isNotEmpty) {
+      //     final block = yamlBlock.join('\n');
+      //     final ym = yaml.loadYaml(block) as yaml.YamlMap;
+
+      //     pageOptions
+      //         .addAll(ym.map<String, dynamic>((dynamic key, dynamic value) {
+      //       if (value is yaml.YamlList) {
+      //         return MapEntry<String, yaml.YamlList>(key.toString(), value);
+      //       }
+      //       if (value is yaml.YamlMap) {
+      //         return MapEntry<String, yaml.YamlMap>(key.toString(), value);
+      //       }
+      //       return MapEntry<String, String>(key.toString(), value.toString());
+      //     }));
+
+      //     _resolvePartialsInYamlBlock(
+      //         partialsDir, pageOptions, config.usemarkdown);
+
+      //     // +1 for the YAML-Block-Delimiter ('---') line
+      //     lines.removeRange(0, yamlBlock.length + 1);
+      //   } else {
+      //     lines.removeRange(0, 1);
+      //   }
+      // }
 
       pageOptions = _fillInPageNestingLevel(relativeFileName, pageOptions);
       pageOptions = _fillInDefaultPageOptions(
           config.dateformat, file, pageOptions, config.siteoptions);
       pageOptions['_data'] = dataMap;
       pageOptions['_content'] = renderTemplate(
-          lines.join('\n'),
+          fmDocument.data != null ? fmDocument.content : fileContents,
           pageOptions,
           _partialsResolver(partialsDir,
               isMarkdownSupported: config.usemarkdown));
@@ -118,7 +140,8 @@ class Generator {
       }
 
       var templateContent = '{{_content}}';
-      if (hasYamlBlock == true &&
+      if ((fmDocument.data != null) &&
+          //hasYamlBlock == true &&
           (pageOptions.containsKey('template') == false ||
               pageOptions['template'] != 'none')) {
         final template = _getTemplateFor(
@@ -189,7 +212,7 @@ class Generator {
   /// Example: yaml-block in file
   /// ...
   /// dart: ->usage.badge.dart
-  /// ~~~
+  /// ---
   ///
   /// dart is the page-var.
   /// usage.badge.dart is the partial.
@@ -530,23 +553,6 @@ class Generator {
 
     return html;
   }
-
-//    /**
-//     * Removes everything before ~~~
-//     */
-//    String _removeYamlBlock(String fileContent,final Config config) {
-//
-//        fileContent = fileContent.replaceFirst( RegExp("(?:.|\n)*${config.yamldelimeter}(?:\r\n|\n)",multiLine: true),"");
-//
-//        /// if there is something like ~~~ (xtreme-sample)
-//        fileContent = fileContent.replaceFirst( RegExp("^${config.yamldelimeter}\$"),"");
-//
-//        /// Replace all newlines with some silly characters to protect the newlines because
-//        /// Mustache-Renderer strips them
-//        fileContent = fileContent.replaceAll( RegExp("\n",multiLine: true),_NEWLINE_PROTECTOR);
-//
-//        return fileContent;
-//    }
 
   /// Shows all the available vars for the current page
   ///

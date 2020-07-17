@@ -55,7 +55,7 @@ class Config {
     _settings[Config._CONF_OUTPUT_DIR] = 'web';
     _settings[Config._CONF_WORKSPACE_DIR] = '.';
     _settings[Config._CONF_DATE_FORMAT] = 'dd.MM.yyyy';
-    _settings[Config._CONF_YAML_DELIMITER] = '~~~';
+    _settings[Config._CONF_YAML_DELIMITER] = '---';
     _settings[Config._CONF_USE_MARKDOWN] = true;
     _settings[Config._CONF_DEFAULT_TEMPLATE] = 'default.html';
     _settings[Config._CONF_SASS_COMPILER] =

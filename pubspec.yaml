@@ -27,13 +27,11 @@ dependencies:
   reflected_mustache: ^1.0.0
   intl: ^0.16.1
   http_server: ^0.9.0
-
   system_info: ^0.1.0
   where: ^8.0.0
-  
   packages: ^0.4.0
-
   watcher: ^0.9.7
+  front_matter: ^1.1.0
     
 dev_dependencies:
   test: any

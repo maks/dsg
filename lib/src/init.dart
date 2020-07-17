@@ -90,8 +90,9 @@ class Init {
     final file = File('${config.contentfolder}/index.html');
     if (!await file.exists()) {
       final content = '''
+                ---
                 title: My index page
-                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                ---
                 <section class="main">
                     My content
                 </section>
