@@ -1,4 +1,5 @@
-# Anything above the '~~~' line is interpreted as YAML,
+---
+# Anything above the '---' line is interpreted as YAML,
 # and is used to set variables you can access from your template tags.
 # This is an example of a YAML comment which will be completely ignored.
 
@@ -45,13 +46,13 @@ date_format: yMd
 # will use the one listed for 'default_template' in your site.yaml
 
 #template: info_page
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
 ### {{title}} (Content)
 #### Subheadline
 
 
-3 `~`'s is the minimum for designating and separating a [YAML][yaml] block, but they can be extended longer -- all that matters
-is that the tildes (`~`) are on their own line.
+3 `---`'s is the minimum for designating and separating a [YAML][yaml] block, but they can be extended longer -- all that matters
+is that the tildes (`-`) are on their own line.
 
 And anything beyond that gets interpreted as [Markdown][markdown]!
 

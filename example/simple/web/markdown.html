@@ -82,18 +82,19 @@
     </header>    <main class="mdl-layout__content">
         <section class="main-section">
             <!-- '_content' contains the contents of the markdown file (minus the yaml variables in the header) -->
-            <h3>Markdown2 (Content)</h3>
-<h4>Subheadline</h4>
-<p>3 <code>~</code>'s is the minimum for designating and separating a <a href="http://rhnh.net/2011/01/31/yaml-tutorial">YAML</a> block, but they can be extended longer -- all that matters
-is that the tildes (<code>~</code>) are on their own line.</p>
+            ++ <hr />
+<h3 id="markdown2-content">Markdown2 (Content)</h3>
+<h4 id="subheadline">Subheadline</h4>
+<p>3 <code>---</code>'s is the minimum for designating and separating a <a href="http://rhnh.net/2011/01/31/yaml-tutorial">YAML</a> block, but they can be extended longer -- all that matters
+is that the tildes (<code>-</code>) are on their own line.</p>
 <p>And anything beyond that gets interpreted as <a href="http://daringfireball.net/projects/markdown/syntax">Markdown</a>!</p>
 <p>You can even use template tags in here, for any variables you set in in the top YAML block, or in your <code>site.yaml</code> file:</p>
 <p>This post's title is: "Markdown2"</p>
-<p>This file was last modified on 12/6/2016</p>
+<p>This file was last modified on 7/17/2020</p>
 <p>Link to <a href="about/">subpages</a></p>
 <p>Note that variables beginning with an underscore designate <em>implicit</em> metadata added by <strong>SiteGen</strong>.</p>
 <p>Some vars that are always available by default:</p>
-<p>Image: <img alt="Logo" src="assets/images/ios-desktop.png" /></p>
+<p>Image: <img src="assets/images/ios-desktop.png" alt="Logo" /></p>
 <hr /><li>
     foo1
 </li>
@@ -107,15 +108,33 @@ is that the tildes (<code>~</code>) are on their own line.</p>
     foo8
 </li>
 <hr />
-<pre><code>[`title`: post title, automatically set to name of markdown file if left blank, `_site`: site.yaml values, `_date`: post 'last modified' date, `_content`: post content (only accessible from templates, not markdown)]
+<pre><code>`title`: post title, automatically set to name of markdown file if left blank
+`_site`: site.yaml values
+`_date`: post 'last modified' date
+`_content`: post content (only accessible from templates, not markdown)
 </code></pre>
 <p>You can see all the vars you can use if you start <strong>SiteGen</strong> with <code>--loglevel debug</code>.   </p>
 <p>And as you can see, you can also use mustache logic to iterate through yaml maps and lists:</p>
-<p><a href=""></a>   </p><ul><li>[<a href="https://github.com/MikeMitterer/dart-sitegen">SiteGen</a>, <a href="http://daringfireball.net/projects/markdown/syntax">Markdown</a>, <a href="http://mustache.github.io/mustache.5.html">Mustache</a>, <a href="http://rhnh.net/2011/01/31/yaml-tutorial">YAML</a>]</li></ul><ul><li>[hallo, foo, bar, baz]</li></ul>
+<p><a href="https://dartlang.org">Dart</a><br />
+<a href="https://pub.dartlang.org">Pub</a><br />
+<a href="http://google.com">Google</a><br />
+<a href="http://github.com">Github</a>   </p>
+<ul>
+<li><a href="https://github.com/MikeMitterer/dart-sitegen">SiteGen</a></li>
+<li><a href="http://daringfireball.net/projects/markdown/syntax">Markdown</a></li>
+<li><a href="http://mustache.github.io/mustache.5.html">Mustache</a></li>
+<li><a href="http://rhnh.net/2011/01/31/yaml-tutorial">YAML</a></li>
+</ul>
+<ul>
+<li>hallo</li>
+<li>foo</li>
+<li>bar</li>
+<li>baz</li>
+</ul>
 <p>Note how you need to use a <code>.</code> to access a list item, but can access map/dict keys directly.</p>
 <p>You can of course disable these markdown templating features by setting <code>markdown_templating: true</code> in your site.yaml file.
 Same ideas apply when writing your actual HTML templates. See <a href="http://mustache.github.io/mustache.5.html">mustache's docs</a> for more templating info.</p>
-
+ ==
         </section>
         <footer class="mdl-mega-footer">
             <div class="mdl-mega-footer--middle-section">
