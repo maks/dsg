@@ -12,6 +12,7 @@ class Config {
   static const _CONF_TEMPLATE_DIR = 'template_dir';
   static const _CONF_OUTPUT_DIR = 'output_dir';
   static const _CONF_DATA_DIR = 'data_dir';
+  static const _CONF_LISTINGS_DIR = 'listings_dir';
   static const _CONF_PARTIALS_DIR = 'partials_dir';
   static const _CONF_ASSETS_DIR = 'assets_dir';
   static const _CONF_WORKSPACE_DIR = 'workspace';
@@ -49,6 +50,7 @@ class Config {
     _settings[Config._CONF_CONTENT_DIR] = '${_CONFIG_FOLDER}/html/_content';
     _settings[Config._CONF_TEMPLATE_DIR] = '${_CONFIG_FOLDER}/html/_templates';
     _settings[Config._CONF_DATA_DIR] = '${_CONFIG_FOLDER}/html/_data';
+    _settings[Config._CONF_LISTINGS_DIR] = '${_CONFIG_FOLDER}/html/_listings';
     _settings[Config._CONF_PARTIALS_DIR] = '${_CONFIG_FOLDER}/html/_partials';
     _settings[Config._CONF_ASSETS_DIR] = '${_CONFIG_FOLDER}/html/_assets';
 
@@ -104,6 +106,8 @@ class Config {
   String get outputfolder => _settings[Config._CONF_OUTPUT_DIR] as String;
 
   String get datafolder => _settings[Config._CONF_DATA_DIR] as String;
+
+  String get listingsfolder => _settings[Config._CONF_LISTINGS_DIR] as String;
 
   String get partialsfolder => _settings[Config._CONF_PARTIALS_DIR] as String;
 

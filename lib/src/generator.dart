@@ -29,11 +29,12 @@ class Generator {
   static const String _NEWLINE_PROTECTOR = '@@@#@@@';
 
   /// Render and output your static site (WARNING: overwrites existing HTML files in output directory).
-  void generate(final Config config) {
+  void generate(final Config config) async {
     final contentDir = Directory(path.absolute(config.contentfolder));
     final templateDir = Directory(path.absolute(config.templatefolder));
     final outputDir = Directory(path.absolute(config.outputfolder));
     final dataDir = Directory(path.absolute(config.datafolder));
+    final listingsDir = Directory(path.absolute(config.listingsfolder));
     final partialsDir = Directory(path.absolute(config.partialsfolder));
     final assetsDir = Directory(path.absolute(config.assetsfolder));
 
@@ -50,8 +51,13 @@ class Generator {
     final templates = _listTemplatesIn(templateDir);
     final dataFiles =
         dataDir.existsSync() ? _listDataFilesIn(dataDir) : <File>[];
+    final listingsMap = listingsDir.existsSync()
+        ? await getListingsMap(listingsDir, config.yamldelimeter)
+        : null;
 
     final dataMap = _getDataMap(dataFiles);
+
+    _logger.info('Listings... ${listingsMap.keys}');
 
     _logger.info('Generating .html files...');
 
@@ -67,7 +73,7 @@ class Generator {
       final fileContents = file.readAsStringSync();
       fm.FrontMatterDocument fmDocument;
       try {
-        fmDocument = fm.parse(fileContents);
+        fmDocument = fm.parse(fileContents, delimiter: config.yamldelimeter);
       } catch (e) {
         _logger.severe('Invalid Content File: ${file.path}');
         return;
@@ -94,6 +100,7 @@ class Generator {
       pageOptions = _fillInDefaultPageOptions(
           config.dateformat, file, pageOptions, config.siteoptions);
       pageOptions['_data'] = dataMap;
+      pageOptions['_lists'] = listingsMap;
       pageOptions['_content'] = renderTemplate(
           fmDocument.data != null ? fmDocument.content : fileContents,
           pageOptions,
@@ -178,7 +185,7 @@ class Generator {
     }
   }
 
-  /// If there is a reference to a partial in the yaml block the contents of the partial becomes the the
+  /// If there is a reference to a partial in the yaml block the contents of the partial becomes the
   /// contents of the page-var.
   ///
   /// Example: yaml-block in file
@@ -322,8 +329,8 @@ class Generator {
         .toList();
   }
 
-  List<File> _listDataFilesIn(final Directory contentDir) {
-    return contentDir
+  List<File> _listDataFilesIn(final Directory dataDir) {
+    return dataDir
         .listSync(recursive: true)
         .where((file) =>
             file is File &&
