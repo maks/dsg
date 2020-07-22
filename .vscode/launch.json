@@ -12,7 +12,7 @@
             "args": [
                 "-g",
             ],
-            "cwd": "${workspaceFolder}/example/simple",
+            "cwd": "${workspaceFolder}/example/simple"
         }
     ]
 }
