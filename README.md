@@ -248,7 +248,7 @@ have the option to use a [YAML](https://rhnh.net/2011/01/31/yaml-tutorial) "fron
     {{title}}
     Normal Markdown content here...
 
-As you can see, a line of tildes (`~`) is used to delimit your YAML block (marking start and end lines). You can access/inject your values into
+As you can see, a line of dashes (`-`) is used to delimit your YAML block (marking start and end lines). You can access/inject your values into
 your pages using [mustache template syntax](https://mustache.github.io/mustache.5.html). You can do this either inside your dedicated HTML/mustache templates:
 
     <ul>
