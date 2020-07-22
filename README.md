@@ -177,6 +177,38 @@ Here is a sample how to use such data:
 </ul>
 ```
 
+**.dsg/html/_listings**: [optional] This is the place where you can store your listings configuration files.  
+Listing files are in yaml format with the following parameters supported: `path`, `filter`, `sort_by`
+
+The `path` is a path relative to `.dsg/html/_content`.
+The `filter` specifies which files to list within the given path.
+The `sort_by` specifies a property.
+
+eg.
+
+```yaml
+path: blog
+filter: "*.md"
+sort_by: lastModified
+```
+
+**note:** `sortby` not yet implemented.
+
+**DSG** injects your listings into a global _lists variable. For each file all of the files YAML front-matter properties are available along with the files:
+
+* `filename`:  the files name without extension.
+* `last_modified`: the files last modified date time stamp.
+
+Here is a sample how to use a listing:
+  
+```html
+<ul>
+    {{#_lists.blog}}
+    <li>{{ title }}</li>
+    {{/_data.blog}}
+</ul>
+```
+
 **.dsg/html/_assets**: [optional] Additional assets that you don't want to have in _content. The following file types are supported:
 * .scss 
 * .jpg

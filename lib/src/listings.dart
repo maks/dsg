@@ -10,7 +10,7 @@ class ListingConfig {
   final Map<dynamic, dynamic> _config;
   String get path => _config['path'] as String;
   String get filter => _config['filter'] as String;
-  String get sortby => _config['sortby'] as String;
+  String get sortby => _config['sort_by'] as String;
 
   ListingConfig(this._config);
 }
@@ -59,7 +59,7 @@ Future<List<Map<dynamic, dynamic>>> _dirList(
 Future<Map<dynamic, dynamic>> fileDataMap(File f, String yamldelimiter) async {
   final fileData = <dynamic, dynamic>{};
   fileData['filename'] = path.basenameWithoutExtension(f.path);
-  fileData['lastModified'] = f.lastModifiedSync();
+  fileData['last_modified'] = f.lastModifiedSync();
 
   fileData.addAll(await _getFrontMatter(f.path, yamldelimiter));
 
