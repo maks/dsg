@@ -29,11 +29,12 @@ class Generator {
   static const String _NEWLINE_PROTECTOR = '@@@#@@@';
 
   /// Render and output your static site (WARNING: overwrites existing HTML files in output directory).
-  void generate(final Config config) {
+  void generate(final Config config) async {
     final contentDir = Directory(path.absolute(config.contentfolder));
     final templateDir = Directory(path.absolute(config.templatefolder));
     final outputDir = Directory(path.absolute(config.outputfolder));
     final dataDir = Directory(path.absolute(config.datafolder));
+    final listingsDir = Directory(path.absolute(config.listingsfolder));
     final partialsDir = Directory(path.absolute(config.partialsfolder));
     final assetsDir = Directory(path.absolute(config.assetsfolder));
 
@@ -50,10 +51,16 @@ class Generator {
     final templates = _listTemplatesIn(templateDir);
     final dataFiles =
         dataDir.existsSync() ? _listDataFilesIn(dataDir) : <File>[];
+    final listingsMap = listingsDir.existsSync()
+        ? await getListingsMap(listingsDir, config.yamldelimeter)
+        : null;
 
     final dataMap = _getDataMap(dataFiles);
 
+    _logger.info('Listings... ${listingsMap.keys}');
+
     _logger.info('Generating .html files...');
+
     for (final file in files) {
       final relativeFileName =
           file.path.replaceAll('${contentDir.path}', '').replaceFirst('/', '');
@@ -62,12 +69,11 @@ class Generator {
           path.extension(relativeFileName).replaceFirst('.', '').toLowerCase();
 
       _logger.fine('\nFile: ${relativeFileName}, Path: $relativePath');
-      //final lines = file.readAsLinesSync();
 
       final fileContents = file.readAsStringSync();
       fm.FrontMatterDocument fmDocument;
       try {
-        fmDocument = fm.parse(fileContents);
+        fmDocument = fm.parse(fileContents, delimiter: config.yamldelimeter);
       } catch (e) {
         _logger.severe('Invalid Content File: ${file.path}');
         return;
@@ -85,42 +91,16 @@ class Generator {
           }
           return MapEntry<String, String>(key.toString(), value.toString());
         }));
+
+        _resolvePartialsInYamlBlock(
+            partialsDir, pageOptions, config.usemarkdown);
       }
-
-      // final hasYamlBlock =
-      //     _hasYamlBlock(config.yamldelimeter, lines, extension);
-      // if (hasYamlBlock) {
-      //   final yamlBlock =
-      //       _extractYamlBlockFrom(config.yamldelimeter, lines, extension);
-      //   if (yamlBlock.isNotEmpty) {
-      //     final block = yamlBlock.join('\n');
-      //     final ym = yaml.loadYaml(block) as yaml.YamlMap;
-
-      //     pageOptions
-      //         .addAll(ym.map<String, dynamic>((dynamic key, dynamic value) {
-      //       if (value is yaml.YamlList) {
-      //         return MapEntry<String, yaml.YamlList>(key.toString(), value);
-      //       }
-      //       if (value is yaml.YamlMap) {
-      //         return MapEntry<String, yaml.YamlMap>(key.toString(), value);
-      //       }
-      //       return MapEntry<String, String>(key.toString(), value.toString());
-      //     }));
-
-      //     _resolvePartialsInYamlBlock(
-      //         partialsDir, pageOptions, config.usemarkdown);
-
-      //     // +1 for the YAML-Block-Delimiter ('---') line
-      //     lines.removeRange(0, yamlBlock.length + 1);
-      //   } else {
-      //     lines.removeRange(0, 1);
-      //   }
-      // }
 
       pageOptions = _fillInPageNestingLevel(relativeFileName, pageOptions);
       pageOptions = _fillInDefaultPageOptions(
           config.dateformat, file, pageOptions, config.siteoptions);
       pageOptions['_data'] = dataMap;
+      pageOptions['_lists'] = listingsMap;
       pageOptions['_content'] = renderTemplate(
           fmDocument.data != null ? fmDocument.content : fileContents,
           pageOptions,
@@ -141,7 +121,6 @@ class Generator {
 
       var templateContent = '{{_content}}';
       if ((fmDocument.data != null) &&
-          //hasYamlBlock == true &&
           (pageOptions.containsKey('template') == false ||
               pageOptions['template'] != 'none')) {
         final template = _getTemplateFor(
@@ -206,7 +185,7 @@ class Generator {
     }
   }
 
-  /// If there is a reference to a partial in the yaml block the contents of the partial becomes the the
+  /// If there is a reference to a partial in the yaml block the contents of the partial becomes the
   /// contents of the page-var.
   ///
   /// Example: yaml-block in file
@@ -350,8 +329,8 @@ class Generator {
         .toList();
   }
 
-  List<File> _listDataFilesIn(final Directory contentDir) {
-    return contentDir
+  List<File> _listDataFilesIn(final Directory dataDir) {
+    return dataDir
         .listSync(recursive: true)
         .where((file) =>
             file is File &&
@@ -368,60 +347,6 @@ class Generator {
             page_options['markdown_templating'] as bool);
   }
 
-  bool _hasYamlBlock(final String delimiter, final List<String> content,
-      final String forExtension) {
-    Validate.notBlank(delimiter);
-    Validate.notEmpty(content);
-
-    final startsWithString = _startStringForYamlBlock(delimiter, forExtension);
-    final endsWithString = delimiter;
-
-    final hasYamlBlock = content.any((line) =>
-        line.startsWith(startsWithString) && line.endsWith(endsWithString));
-    return hasYamlBlock;
-  }
-
-  List<String> _extractYamlBlockFrom(final String delimiter,
-      final List<String> content, final String forExtension) {
-    Validate.notBlank(delimiter);
-    Validate.notEmpty(content);
-    Validate.notBlank(forExtension);
-
-    final yamlStartBlock = _startStringForYamlBlock(delimiter, forExtension);
-    final lines = content
-        .skip(1)
-        .takeWhile((line) => !line.startsWith(yamlStartBlock))
-        .toList();
-    final yamlBlock = <String>[];
-
-    switch (forExtension) {
-      case 'dart':
-        lines.forEach((final String line) {
-          yamlBlock.add(line.replaceFirst(RegExp(r'// '), ''));
-        });
-        break;
-
-      default:
-        yamlBlock.addAll(lines);
-        break;
-    }
-    return yamlBlock;
-  }
-
-  String _startStringForYamlBlock(
-      final String delimiter, final String forExtension) {
-    Validate.notBlank(delimiter);
-    Validate.notBlank(forExtension);
-
-    var startsWithString = delimiter;
-    switch (forExtension) {
-      case 'dart':
-        startsWithString = '//$delimiter';
-        break;
-    }
-    return startsWithString;
-  }
-
   Map<String, dynamic> _fillInDefaultPageOptions(
       final String defaultDateFormat,
       final File file,
@@ -431,8 +356,6 @@ class Generator {
     pageOptions.putIfAbsent('title', () => filename);
 
     pageOptions['_site'] = siteOptions;
-
-    //_logger.info(pageOptions.toString());
 
     /// See [DateFormat](https://api.dartlang.org/docs/channels/stable/latest/intl/DateFormat.html) for formatting options
     final date_format = DateFormat(defaultDateFormat);
