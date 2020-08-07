@@ -28,6 +28,7 @@ part 'src/config.dart';
 part 'src/generator.dart';
 part 'src/init.dart';
 part 'src/options.dart';
+part 'src/dates.dart';
 
 bool _runsOnOSX() => (SysInfo.operatingSystemName == 'Mac OS X');
 
