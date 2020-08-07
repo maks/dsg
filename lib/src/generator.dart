@@ -57,7 +57,7 @@ class Generator {
 
     final dataMap = _getDataMap(dataFiles);
 
-    _logger.info('Listings... ${listingsMap.keys}');
+    _logger.info('Listings... ${listingsMap?.keys}');
 
     _logger.info('Generating .html files...');
 

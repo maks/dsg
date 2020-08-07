@@ -194,7 +194,7 @@ sort_by: lastModified
 
 **note:** `sortby` not yet implemented.
 
-**DSG** injects your listings into a global _lists variable. For each file all of the files YAML front-matter properties are available along with the files:
+**DSG** injects your listings into a global `_lists` variable. For each file all of the files YAML front-matter properties are available along with the files:
 
 * `filename`:  the files name without extension.
 * `last_modified`: the files last modified date time stamp.
