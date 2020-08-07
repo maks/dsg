@@ -9,6 +9,8 @@ typedef TemplateRenderer = String Function(
 /// Resolved partial-names into mustache.Templates
 typedef PartialsResolver = mustache.Template Function(String name);
 
+String _outputFormat = 'MMMM dd yyyy';
+
 /// Can be set to define a custom [rendering function](TemplateRenderer) to handle your template files
 /// and use any templating language of your choice.
 ///
@@ -18,6 +20,13 @@ TemplateRenderer renderTemplate =
     (final String source, final Map options, final PartialsResolver resolver) {
   final template = mustache.Template(source,
       htmlEscapeValues: false, partialResolver: resolver, lenient: true);
+
+  final inFormat = 'yyyy-MM-dd';
+
+  final formatDate = (mustache.LambdaContext ctx) =>
+      '${_parseDate(ctx.renderString(), inFormat, _outputFormat)}';
+
+  options['formatDate'] = formatDate;
 
   return template.renderString(options);
 };
@@ -56,6 +65,8 @@ class Generator {
         : null;
 
     final dataMap = _getDataMap(dataFiles);
+
+    _outputFormat = config.dateformat;
 
     _logger.info('Listings... ${listingsMap?.keys}');
 

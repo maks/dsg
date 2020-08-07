@@ -182,17 +182,15 @@ Listing files are in yaml format with the following parameters supported: `path`
 
 The `path` is a path relative to `.dsg/html/_content`.
 The `filter` specifies which files to list within the given path.
-The `sort_by` specifies a property.
+The `sort_by` specifies a property **AND** the `ASC` or `DESC`.
 
-eg.
+eg. to sort in chronological descending order based on a front-matter property called `pub_date`
 
 ```yaml
 path: blog
 filter: "*.md"
-sort_by: lastModified
+sort_by: pub_date DESC
 ```
-
-**note:** `sortby` not yet implemented.
 
 **DSG** injects your listings into a global `_lists` variable. For each file all of the files YAML front-matter properties are available along with the files:
 
@@ -335,6 +333,25 @@ template: default.html
 dart: ->usage.badge.dart  
 ---  
 ```
+
+## Template Functions
+
+Mustache provides for the use of "lambdas" which are essentially names functions that can be accessed in templates using the section syntax.
+The currently available functions in DSG are listed below.
+
+### formatDate
+
+Allows formating either a hard coded string or another template variable written in the format `yyyy-MM-dd` the function will ouput the it using the format specified in `date_format` in `site.yaml`.
+
+eg. given in site.yaml a `date_format: dd MMM yyyy` and then a variable defined in your front-matter like `article_date: 2020-01-26`
+and then a template with:
+```mustache
+
+Article published on: {{# formatDate }} {{ date }} {{/ formatDate }} 
+
+```
+will output: `Article published on: 26 Jan 2020`
+
 
 ## SASS
 If DSG finds a .scss file in your output dir (web) it compiles it to the corresponding .css file.      

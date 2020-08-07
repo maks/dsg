@@ -33,8 +33,19 @@ Future<Map<String, List<Map>>> getListingsMap(
   await listingsMap.forEach((key, value) async {
     listings[key] = await value;
 
-    // TODO:
-    _logger.info('SORT listing: $key BY: ${configsMap[key].sortby}');
+    final sortBy = configsMap[key].sortby.split(' ')[0];
+    final sortDirection = configsMap[key].sortby.split(' ')[1];
+
+    final asc = (dynamic a, dynamic b) =>
+        a[sortBy].toString().compareTo(b[sortBy].toString());
+    final desc = (dynamic a, dynamic b) =>
+        b[sortBy].toString().compareTo(a[sortBy].toString());
+
+    final sortFunction = (sortDirection == 'DESC') ? desc : asc;
+
+    _logger.info('SORT listing: $key BY: $sortBy');
+
+    listings[key].sort(sortFunction);
   });
   return listings;
 }
