@@ -182,17 +182,15 @@ Listing files are in yaml format with the following parameters supported: `path`
 
 The `path` is a path relative to `.dsg/html/_content`.
 The `filter` specifies which files to list within the given path.
-The `sort_by` specifies a property.
+The `sort_by` specifies a property **AND** the `ASC` or `DESC`.
 
-eg.
+eg. to sort in chronological descending order based on a front-matter property called `pub_date`
 
 ```yaml
 path: blog
 filter: "*.md"
-sort_by: lastModified
+sort_by: pub_date DESC
 ```
-
-**note:** `sortby` not yet implemented.
 
 **DSG** injects your listings into a global `_lists` variable. For each file all of the files YAML front-matter properties are available along with the files:
 
