@@ -336,6 +336,25 @@ dart: ->usage.badge.dart
 ---  
 ```
 
+## Template Functions
+
+Mustache provides for the use of "lambdas" which are essentially names functions that can be accessed in templates using the section syntax.
+The currently available functions in DSG are listed below.
+
+### formatDate
+
+Allows formating either a hard coded string or another template variable written in the format `yyyy-MM-dd` the function will ouput the it using the format specified in `date_format` in `site.yaml`.
+
+eg. given in site.yaml a `date_format: dd MMM yyyy` and then a variable defined in your front-matter like `article_date: 2020-01-26`
+and then a template with:
+```mustache
+
+Article published on: {{# formatDate }} {{ date }} {{/ formatDate }} 
+
+```
+will output: `Article published on: 26 Jan 2020`
+
+
 ## SASS
 If DSG finds a .scss file in your output dir (web) it compiles it to the corresponding .css file.      
 Install instruction for SASS can be found [here](https://sass-lang.com/install)  
