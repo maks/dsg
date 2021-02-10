@@ -20,6 +20,8 @@ pub global activate dsg
 
 or you can just download the self-contained executable for your platform from the [Github repo](https://github.com/maks/dsg/actions).
 
+See [this article on how DSG came to be and how you can use it to deploy your website](https://medium.com/flutter-community/same-site-new-tools-7a3fd5d5f517).
+
 ## Example
 
    - Install DSG (see above)
