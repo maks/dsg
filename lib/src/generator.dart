@@ -170,7 +170,9 @@ class Generator {
     for (final image in images) {
       final relativeFileName =
           image.path.replaceAll('${contentDir.path}', '').replaceFirst('/', '');
-      final relativePath = path.dirname(relativeFileName).replaceFirst('.', '');
+      final relativePath = path.dirname(relativeFileName).startsWith('.')
+          ? path.dirname(relativeFileName)
+          : path.dirname(relativeFileName).replaceFirst('.', '');
 
       final outputPath = _createOutputPath(outputDir, relativePath);
       final outputFile =
