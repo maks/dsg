@@ -11,7 +11,6 @@ import 'package:dsg/src/listings.dart';
 import 'package:front_matter/front_matter.dart' as fm;
 import 'package:http_server/http_server.dart';
 import 'package:intl/intl.dart';
-import 'package:logging/logging.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:packages/packages.dart';
 import 'package:path/path.dart' as path;

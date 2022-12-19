@@ -47,6 +47,8 @@ class Generator {
     final partialsDir = Directory(path.absolute(config.partialsfolder));
     final assetsDir = Directory(path.absolute(config.assetsfolder));
 
+    outputDir.createSync(); // ensure output dir exists
+
     Validate.isTrue(
         contentDir.existsSync(), 'ContentDir ${contentDir.path} must exist!');
     Validate.isTrue(templateDir.existsSync(),
@@ -168,7 +170,9 @@ class Generator {
     for (final image in images) {
       final relativeFileName =
           image.path.replaceAll('${contentDir.path}', '').replaceFirst('/', '');
-      final relativePath = path.dirname(relativeFileName).replaceFirst('.', '');
+      final relativePath = path.dirname(relativeFileName).startsWith('.')
+          ? path.dirname(relativeFileName)
+          : path.dirname(relativeFileName).replaceFirst('.', '');
 
       final outputPath = _createOutputPath(outputDir, relativePath);
       final outputFile =
@@ -177,7 +181,7 @@ class Generator {
 
       final outputPathReplaced =
           outputFile.path.replaceFirst(outputDir.path, '');
-      _logger.info('   $outputPathReplaced - copied!');
+      _logger.info('image: $outputPathReplaced - copied!');
     }
 
     for (final asset in assets) {
@@ -192,7 +196,7 @@ class Generator {
 
       final outputPathReplaced =
           outputFile.path.replaceFirst(outputDir.path, '');
-      _logger.info('   $outputPathReplaced - copied!');
+      _logger.info('asset: $outputPathReplaced - copied!');
     }
   }
 
@@ -307,6 +311,7 @@ class Generator {
                 file.path.endsWith('.tff') ||
                 file.path.endsWith('.ico') ||
                 file.path.endsWith('.txt') ||
+                file.path.endsWith('webfinger') ||
                 file.path.endsWith('.pdf')) &&
             !file.path.contains('packages'))
         .map((final FileSystemEntity entity) => entity as File)

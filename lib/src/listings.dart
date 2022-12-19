@@ -1,8 +1,9 @@
 import 'dart:io';
+
+import 'package:front_matter/front_matter.dart' as fm;
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as path;
 import 'package:yaml/yaml.dart' as yaml;
-import 'package:front_matter/front_matter.dart' as fm;
 
 final Logger _logger = Logger('dsg.Generator');
 
