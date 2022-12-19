@@ -47,6 +47,8 @@ class Generator {
     final partialsDir = Directory(path.absolute(config.partialsfolder));
     final assetsDir = Directory(path.absolute(config.assetsfolder));
 
+    outputDir.createSync(); // ensure output dir exists
+
     Validate.isTrue(
         contentDir.existsSync(), 'ContentDir ${contentDir.path} must exist!');
     Validate.isTrue(templateDir.existsSync(),
