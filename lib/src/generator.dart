@@ -179,7 +179,7 @@ class Generator {
 
       final outputPathReplaced =
           outputFile.path.replaceFirst(outputDir.path, '');
-      _logger.info('   $outputPathReplaced - copied!');
+      _logger.info('image: $outputPathReplaced - copied!');
     }
 
     for (final asset in assets) {
@@ -194,7 +194,7 @@ class Generator {
 
       final outputPathReplaced =
           outputFile.path.replaceFirst(outputDir.path, '');
-      _logger.info('   $outputPathReplaced - copied!');
+      _logger.info('asset: $outputPathReplaced - copied!');
     }
   }
 
@@ -309,6 +309,7 @@ class Generator {
                 file.path.endsWith('.tff') ||
                 file.path.endsWith('.ico') ||
                 file.path.endsWith('.txt') ||
+                file.path.endsWith('webfinger') ||
                 file.path.endsWith('.pdf')) &&
             !file.path.contains('packages'))
         .map((final FileSystemEntity entity) => entity as File)
