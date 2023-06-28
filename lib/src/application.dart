@@ -21,14 +21,13 @@ class Application {
 
   Future<int> run(final List<String> args) async {
     try {
-      final cm = await CommandManager.getInstance();
       final argResults = options.parse(args);
-      final config = Config(argResults, cm);
+      final config = Config(argResults);
 
       _configLogging(config.loglevel);
 
       try {
-        _testPreconditions(cm, config);
+        _testPreconditions(config);
       } catch (error) {
         stderr.writeln(error.toString());
         return 1;
@@ -65,11 +64,6 @@ class Application {
         Generator().generate(config);
       }
 
-      if (argResults.wasParsed(Options._ARG_GENERATE_CSS)) {
-        foundOptionToWorkWith = true;
-        _compileSCSSFile(config.outputfolder, config);
-      }
-
       if (argResults.wasParsed(Options._ARG_WATCH) ||
           argResults.wasParsed(Options._ARG_WATCH_AND_SERVE)) {
         foundOptionToWorkWith = true;
@@ -92,15 +86,6 @@ class Application {
 
           Generator().generate(config);
         }
-        watchScss(config.outputfolder, config);
-        // watchToRefresh(config.outputfolder, config);
-
-        watchAdditionalFolderScss(
-            config.watchfolder1, config.outputfolder, config);
-        watchAdditionalFolderScss(
-            config.watchfolder2, config.outputfolder, config);
-        watchAdditionalFolderScss(
-            config.watchfolder3, config.outputfolder, config);
       }
 
       if (argResults.wasParsed(Options._ARG_SERVE) ||
@@ -211,218 +196,17 @@ class Application {
     });
   }
 
-  void watchScss(final String folder, final Config config) {
-    Validate.notBlank(folder);
-    Validate.notNull(config);
-
-    _logger.fine('Observing $folder (SCSS)... ');
-    final dir = Directory(folder);
-    final scssFiles = _listSCSSFilesIn(dir);
-
-    if (scssFiles.isEmpty) {
-      _logger.info('No SCSS files found');
-      return;
-    }
-
-    _compileSCSSFile(folder, config);
-
-    try {
-      scssFiles.forEach((final File file) {
-        _logger.info('Observing: (watchScss) ${file.path}');
-
-        file
-            .watch(events: FileSystemEvent.modify)
-            .listen((final FileSystemEvent event) {
-          _logger.fine(event.toString());
-          //_logger.info("Scss: ${scssFile}, CSS: ${cssFile}");
-
-          timerWatchCss ??= Timer(Duration(milliseconds: 500), () {
-            _compileSCSSFile(folder, config);
-            timerWatchCss = null;
-          });
-        });
-      });
-    } on StateError {
-      _logger.info('Found no SCSS without a _ at the beginning...');
-    }
-  }
-
-  void watchAdditionalFolderScss(final String additionalWatchFolder,
-      final String cssFolder, final Config config) {
-    Validate.notBlank(cssFolder);
-    Validate.notNull(config);
-
-    if (additionalWatchFolder.isEmpty) {
-      return;
-    }
-
-    _logger.fine('Observing $cssFolder (SCSS)... ');
-
-    final dirToCheck = Directory(additionalWatchFolder);
-    final dir = Directory(cssFolder);
-    final scssFiles = _listSCSSFilesIn(dir);
-
-    if (scssFiles.isEmpty) {
-      _logger.info('No SCSS files found');
-      return;
-    }
-
-    _compileSCSSFile(cssFolder, config);
-
-    try {
-      _logger.info('Observing: (watchAdditionalFolderScss) ${dirToCheck.path}');
-
-      dirToCheck
-          .watch(events: FileSystemEvent.modify)
-          .listen((final FileSystemEvent event) {
-        _logger.fine(event.toString());
-        // _logger.info("Scss: ${scssFile}, CSS: ${cssFile}");
-
-        timerWatchCss ??= Timer(Duration(milliseconds: 500), () {
-          _compileSCSSFile(cssFolder, config);
-          timerWatchCss = null;
-        });
-      });
-    } on StateError {
-      _logger.info('Found no SCSS without a _ at the beginning...');
-    }
-  }
-
-  void _testPreconditions(final CommandManager cm, final Config config) {
+  void _testPreconditions(final Config config) {
     // if not using sass or prefixer, dont check for them being available
     if (!config.usesass && !config.useautoprefixer) {
       return;
     }
-
-    if ((cm.containsKey(CommandManager.SASS) ||
-            cm.containsKey(CommandManager.SASSC)) &&
-        cm.containsKey(CommandManager.AUTOPREFIXER)) {
-      return;
-    }
-    throw 'Please install SASS (${CommandManager.SASS} | ${CommandManager.SASSC}) '
-        'and AutoPrefixer (${CommandManager.AUTOPREFIXER})';
-  }
-
-  void _compileSCSSFile(final String folder, final Config config) {
-    Validate.notBlank(folder);
-    Validate.notNull(config);
-
-    _logger.fine('Observing: (_compileSCSSFile) $folder (SCSS)... ');
-    final dir = Directory(folder);
-    final scssFiles = _listSCSSFilesIn(dir);
-
-    if (scssFiles.isEmpty) {
-      _logger.info('No SCSS files found');
-      return;
-    }
-
-    // mainScssFile is the one not starting with a _ (underscore)
-    File _mainScssFile(final List<File> scssFiles) {
-      final mainScss = scssFiles.firstWhere((final File file) {
-        final pureFilename = path.basename(file.path);
-        return pureFilename.startsWith(RegExp(r'[a-z]', caseSensitive: false));
-      });
-      return mainScss;
-    }
-
-    final mainScss = _mainScssFile(scssFiles);
-
-    final scssFile = mainScss.path;
-    final cssFile = '${path.withoutExtension(scssFile)}.css';
-
-    _logger.info('Main SCSS: $scssFile');
-    _compileScss(scssFile, cssFile, config);
-    _autoPrefixer(cssFile, config);
   }
 
   bool _isFolderAvailable(final String folder) {
     Validate.notBlank(folder);
     final dir = Directory(folder);
     return dir.existsSync();
-  }
-
-  void _compileScss(
-      final String source, final String target, final Config config) {
-    Validate.notBlank(source);
-    Validate.notBlank(target);
-    Validate.notNull(config);
-
-    if (!config.usesass) {
-      _logger
-          .info('Sass was disabled - so your SCSS won\'t be compiled to CSS!');
-      return;
-    }
-
-    final compiler = config.sasscompiler;
-    final environment = <String, String>{};
-
-    if (config.sasspath.isNotEmpty) {
-      // only sass supports SASS_PATH (not sassc)
-      if (!compiler.endsWith('c')) {
-        environment['SASS_PATH'] = config.sasspath;
-        _logger.info('Using SASS_PATH: ${config.sasspath}');
-      } else {
-        _logger.warning('SASS_PATH ist not supported by your compiler!');
-      }
-    }
-
-    _logger.info('Compiling $source -> $target');
-    final result =
-        Process.runSync(compiler, [source, target], environment: environment);
-    if (result.exitCode != 0) {
-      _logger.info('sassc failed with: ${(result.stderr as String).trim()}!');
-      _vickiSay('got a sassc error', config);
-      return;
-    }
-    _logger.info('Done!');
-  }
-
-  void _autoPrefixer(final String cssFile, final Config config) {
-    Validate.notBlank(cssFile);
-    Validate.notNull(config);
-
-    if (!config.useautoprefixer) {
-      _logger
-          .info("Autoprefixing was disabled - so your CSS won't be prefixed!");
-      return;
-    }
-
-    _logger.info('Autoprefixing $cssFile');
-    final result = Process.runSync('autoprefixer-cli', [cssFile]);
-    if (result.exitCode != 0) {
-      _logger.info('prefixer faild with: ${(result.stderr as String).trim()}!');
-      _vickiSay('got a prefixer error', config);
-      return;
-    }
-    _logger.info('Done!');
-  }
-
-  List<File> _listSCSSFilesIn(final Directory dir) {
-    Validate.notNull(dir);
-    return dir
-        .listSync(recursive: true)
-        .where((final file) {
-          return file is File &&
-              file.path.endsWith('.scss') &&
-              !file.path.contains('packages');
-        })
-        .map((final FileSystemEntity entity) => entity as File)
-        .toList();
-  }
-
-  void _vickiSay(final String sentence, final Config config) {
-    Validate.notBlank(sentence);
-
-    if (config.talktome == false) {
-      _logger.severe("Vicki wants to say: '${sentence}'");
-      return;
-    }
-
-    final result = Process.runSync(
-        'say', ['-r', '200', sentence.replaceFirst('wsk_', '')]);
-    if (result.exitCode != 0) {
-      _logger.severe('run faild with: ${(result.stderr as String).trim()}!');
-    }
   }
 
   void _configLogging(final String loglevel) {

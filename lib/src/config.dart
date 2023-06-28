@@ -42,9 +42,8 @@ class Config {
   final ArgResults _argResults;
   final Map<String, dynamic> _settings = <String, dynamic>{};
   final Packages _packages = Packages();
-  final CommandManager _commandmanager;
 
-  Config(this._argResults, this._commandmanager) {
+  Config(this._argResults) {
     _settings[Options._ARG_LOGLEVEL] = 'info';
 
     _settings[Config._CONF_CONTENT_DIR] = '${_CONFIG_FOLDER}/html/_content';
@@ -60,9 +59,7 @@ class Config {
     _settings[Config._CONF_YAML_DELIMITER] = '---';
     _settings[Config._CONF_USE_MARKDOWN] = true;
     _settings[Config._CONF_DEFAULT_TEMPLATE] = 'default.html';
-    _settings[Config._CONF_SASS_COMPILER] =
-        _commandmanager.containsKey('sassc') ? 'sassc' : 'sass';
-    _settings[Config._CONF_SASS_PATH] = '';
+  
     _settings[Config._CONF_BROWSER] = 'Chromium';
 
     _settings[Config._CONF_BROWSER] = 'Chromium';
@@ -246,11 +243,6 @@ class Config {
       } else {
         print('    ${prepareKey(key)} ${value}');
       }
-    });
-
-    _commandmanager._commands
-        .forEach((final String name, final Command command) {
-      print('    ${prepareKey(name)} ${command.exe}');
     });
   }
 

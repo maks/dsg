@@ -18,11 +18,9 @@ import 'package:reflected_mustache/mustache.dart' as mustache;
 import 'package:system_info/system_info.dart';
 import 'package:validate/validate.dart';
 import 'package:watcher/watcher.dart';
-import 'package:where/where.dart';
 import 'package:yaml/yaml.dart' as yaml;
 
 part 'src/application.dart';
-part 'src/command_manager.dart';
 part 'src/config.dart';
 part 'src/generator.dart';
 part 'src/init.dart';
