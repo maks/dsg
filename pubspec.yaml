@@ -33,3 +33,4 @@ dev_dependencies:
   grinder: any
   build_runner: any
   build_test: any
+  lints: ^2.1.1

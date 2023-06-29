@@ -5,14 +5,14 @@ part of dsg;
 ///
 class Init {
 
-  static const String _STYLES_FOLDER = 'styles';
+  static const String _stylesFolder = 'styles';
 
   Future<void> createDirs(final Config config) {
     
     return Future.wait([
       _createDir(config.templatefolder),
       _createDir(config.contentfolder),
-      _createDir('${config.contentfolder}/$_STYLES_FOLDER'),
+      _createDir('${config.contentfolder}/$_stylesFolder'),
       _createDir(config.outputfolder),
       _createDir(config.configfolder)
     ]);
