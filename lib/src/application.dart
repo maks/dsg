@@ -1,21 +1,19 @@
 part of dsg;
 
 class Application {
-  final Logger _logger = Logger('dsg.Application');
-
   /// Commandline options
   final Options options;
 
   /// {timerForPageRefresh} waits 500ms before refreshing the page
   /// If there are more PageRefresh-Requests withing 500ms only the last refresh will be made
-  Timer timerForPageRefresh;
+  late Timer timerForPageRefresh;
 
   /// {timerWatchCss} waits 500ms before it calls it's watch-functions.
   /// If there are more watch-events within 500ms only the last event counts
-  Timer timerWatchCss;
+  late Timer timerWatchCss;
 
   /// {timerWatch} waits 500ms until all watched folders and files updated
-  Timer timerWatch;
+  late Timer timerWatch;
 
   Application() : options = Options();
 
@@ -23,15 +21,6 @@ class Application {
     try {
       final argResults = options.parse(args);
       final config = Config(argResults);
-
-      _configLogging(config.loglevel);
-
-      try {
-        _testPreconditions(config);
-      } catch (error) {
-        stderr.writeln(error.toString());
-        return 1;
-      }
 
       if (argResults.wasParsed(Options._ARG_HELP) ||
           (config.dirstoscan.isEmpty && args.isEmpty)) {
@@ -99,7 +88,7 @@ class Application {
         options.showUsage();
       }
     } on FormatException catch (error) {
-      _logger.shout(error);
+      Log.e('', error);
       options.showUsage();
       return 1;
     }
@@ -108,18 +97,18 @@ class Application {
   }
 
   void serve(final Config config) {
-    Validate.notBlank(config.ip);
-    Validate.notBlank(config.docroot);
-    Validate.notBlank(config.port);
+    check(config.ip).isNotEmpty();
+    check(config.docroot).isNotEmpty();
+    check(config.port).isNotEmpty();
 
     final ip = config.ip;
     final port = config.port;
     final MY_HTTP_ROOT_PATH =
         config.docroot; //Platform.script.resolve(folder).toFilePath();
 
-    VirtualDirectory virtDir;
+    late VirtualDirectory virtDir;
     void _directoryHandler(final Directory dir, final HttpRequest request) {
-      _logger.info(dir);
+      log('$dir');
       final indexUri = Uri.file(dir.path).resolve('index.html');
       virtDir.serveFile(File(indexUri.toFilePath()), request);
     }
@@ -130,57 +119,35 @@ class Application {
       ..jailRoot = false;
     virtDir.directoryHandler = _directoryHandler;
 
-    final packages = Packages();
-
-    // if hasPackages is false then we are not in a Dart-Project
-    final hasPackages = packages.hasPackages;
-
     Future<HttpServer> connect;
     if (config.usesecureconnection) {
       final context = SecurityContext();
       context.useCertificateChain(config.certfile);
       context.usePrivateKey(config.keyfile);
       connect = HttpServer.bindSecure(ip, int.parse(port), context);
-      _logger
-          .info('Using a secure connection on $ip - Scheme should be https!');
+      log('Using a secure connection on $ip - Scheme should be https!');
     } else {
       connect = HttpServer.bind(ip, int.parse(port));
     }
 
     runZoned(() {
       connect.then((final server) {
-        _logger.info('Server running $ip on port: $port, $MY_HTTP_ROOT_PATH');
+        log('Server running $ip on port: $port, $MY_HTTP_ROOT_PATH');
         server.listen((final request) {
-          if (request.uri.path.startsWith('/packages') && hasPackages) {
-            final parts = request.uri.path.split(RegExp(r'(?:/|\\)'));
-            final path = parts.sublist(3).join('/');
-            final packageName = parts[2];
-
-            final package =
-                packages.resolvePackageUri(Uri.parse('package:${packageName}'));
-            final rewritten = '${package.lib.path}/$path'
-                .replaceFirst(RegExp(r'^.*pub\.dartlang\.org/'), 'package:');
-
-            _logger.info(
-                '${request.connectionInfo.remoteAddress.address}:${request.connectionInfo.localPort} - ${request.method} [Rewritten] ${rewritten}');
-            virtDir.serveFile(File('${package.lib.path}/$path'), request);
-          } else {
-            _logger.info(
-                '${request.connectionInfo.remoteAddress.address}:${request.connectionInfo.localPort} - ${request.method} ${request.uri}');
-            virtDir.serveRequest(request);
-          }
+          log('${request.connectionInfo?.remoteAddress.address}:${request.connectionInfo?.localPort} - ${request.method} ${request.uri}');
+          
+          virtDir.serveRequest(request); 
         });
       });
     },
         onError: (Object e, StackTrace stackTrace) =>
-            _logger.severe('Error running http server: $e $stackTrace'));
+            Log.e('Error running http server: $e $stackTrace'));
   }
 
   void watch(final String folder, final Config config) {
-    Validate.notBlank(folder);
-    Validate.notNull(config);
+    check(folder).isNotEmpty();
 
-    _logger.info('Observing (watch) $folder...');
+    log('Observing (watch) $folder...');
 
     final srcDir = Directory(folder);
 
@@ -188,50 +155,13 @@ class Application {
     watcher.events
         .where((final event) => (!event.path.contains('packages')))
         .listen((final event) {
-      _logger.info(event.toString());
-      timerWatch ??= Timer(Duration(milliseconds: 1000), () {
-        Generator().generate(config);
-        timerWatch = null;
-      });
+      log(event.toString());
     });
   }
 
-  void _testPreconditions(final Config config) {
-    // if not using sass or prefixer, dont check for them being available
-    if (!config.usesass && !config.useautoprefixer) {
-      return;
-    }
-  }
-
   bool _isFolderAvailable(final String folder) {
-    Validate.notBlank(folder);
+    check(folder).isNotEmpty();
     final dir = Directory(folder);
     return dir.existsSync();
-  }
-
-  void _configLogging(final String loglevel) {
-    Validate.notBlank(loglevel);
-
-    hierarchicalLoggingEnabled =
-        false; // set this to true - its part of Logging SDK
-
-    // now control the logging.
-    // Turn off all logging first
-    switch (loglevel) {
-      case 'fine':
-      case 'debug':
-        Logger.root.level = Level.FINE;
-        break;
-
-      case 'warning':
-        Logger.root.level = Level.SEVERE;
-        break;
-
-      default:
-        Logger.root.level = Level.INFO;
-    }
-
-    Logger.root.onRecord
-        .listen(LogPrintHandler(transformer: transformerMessageOnly));
   }
 }

@@ -7,7 +7,6 @@ Includes support for:
 * yaml front-matter
 * json / yaml data processing
 * a webserver
-* Sass + autoprefix support  
 
 *think: Jekyll for Dart*
 
@@ -40,38 +39,6 @@ you can see the necessary configuration for HTTPS-Support
 Generate a self-signed certificate, name it dart.cert and dart.key, place it under <project root>/etc 
 and run `dsg -x --usesec` and - voila. That's it!
 
-#### Support for SASS_PATH
-[Understanding and Using Sass Load Paths](https://technology.customink.com/blog/2014/10/09/understanding-and-using-sass-load-paths/)   
-
-These settings in your .dsg/site.yaml ()
-```yaml
-    sasscompiler: sass
-    sass_path:
-      - "package:zengen"
-      - "package:mdl"
-```
-
-generate the following SASS_PATH:
-```bash
-dsg -s
-
-    Settings:
-        Loglevel:                  info
-        ...
-        SASS compiler:             sass
-        SASS_PATH (only for sass): /Users/example/.pub-cache/hosted/pub.dartlang.org/zengen-0.3.2/lib
-                                   /Volumes/Daten/DevLocal/DevDart/MaterialDesignLite/lib
-        ...
-
-```
-As you can see the first path is resolved to .pub-cache, the second path
-is resolve to a local working dir where the mdl-library resides
-
-Now you can define your SASS-Import as follows:
-```scss
-    // Imports package:mdl/lib/assets/styles/button/variables
-    @import "assets/styles/button/variables";
-```
 
 ### What it does
 DSG is a static site generator in [Dart](https://www.dartlang.org/), with a webserver included.
@@ -255,11 +222,7 @@ Supported vars:
 - yaml_delimeter: ---
 - use_markdown: true
 - default_template: default.html
-- sasscompiler: sassc
-- usesass: true
-- autoprefixer: true
 - browser: Chromium
-- talktome: true (on OSX, false on all the other OSs)
 - watchfolder1, watchfolder2 and watchfolder3
 
 ## Markdown
@@ -354,22 +317,6 @@ Article published on: {{# formatDate }} {{ date }} {{/ formatDate }}
 ```
 will output: `Article published on: 26 Jan 2020`
 
-
-## SASS
-If DSG finds a .scss file in your output dir (web) it compiles it to the corresponding .css file.      
-Install instruction for SASS can be found [here](https://sass-lang.com/install)  
-In short it's `gem install sass` and `gem install sassc`  
-
-You can turn off SASS either with `--no-usesass` or with the appropriate setting in site.yaml 
-
-Or **install sassc**, eg on MacOS: `brew install sassc`
-
-## Autoprefixer
-After compiling .SCSS to .CSS DSG calls autoprefixer <yourcss>  
-Install autoprefixer with `npm install --global autoprefixer-cli`
-
-You can turn off Autoprefixer either with `--no-useapfx` or with the appropriate setting in site.yaml 
-    
 # Install
 Install
 ```shell
@@ -393,21 +340,12 @@ Usage: dsg [options]
     -s, --settings         Prints settings
     -h, --help             Shows this message
     -g, --generate         Generate site
-    -c, --generatecss      Generate CSS (compile SCSS2CSS)
     -w, --watch            Observes SRC-dir
     -x, --watchandserve    Shortcut to watch and serve
     -i, --init             Initializes your site
                            (not combinable with other options)
 
         --serve            Serves your site
-        --[no-]usesass     Enables / disables SASS to CSS compiler
-                           (defaults to on)
-
-        --[no-]useapfx     Enables / disables Autoprefixer
-                           (defaults to on)
-
-        --[no-]talktome    Enables / disables Speek-Output
-                           (defaults to on)
 
         --ip               Sets the IP-Address to listen on
                            (defaults to "127.0.0.1")

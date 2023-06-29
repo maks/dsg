@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:front_matter/front_matter.dart' as fm;
+import 'package:front_matter_ml/front_matter_ml.dart' as fm;
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as path;
 import 'package:yaml/yaml.dart' as yaml;
@@ -19,7 +19,7 @@ class ListingConfig {
 /// Returns a Map, wher each key is the name of "listing",
 /// the a listing is a List of Maps, where each Map represents the
 /// metadata for a MD file, including any YAMl Frontmatter that file has
-Future<Map<String, List<Map>>> getListingsMap(
+Future<Map<String, List<Map>?>> getListingsMap(
     Directory dir, String yamlDelimiter) async {
   final listingConfigs = _listingsFilesIn(dir);
 
@@ -28,14 +28,13 @@ Future<Map<String, List<Map>>> getListingsMap(
   final listingsMap = configsMap
       .map((key, value) => MapEntry(key, _dirList(value, yamlDelimiter)));
 
-  final listings = <String, List<Map>>{};
+  final listings = <String, List<Map>?>{};
 
-  await Future.wait(listingsMap.values);
-  await listingsMap.forEach((key, value) async {
-    listings[key] = await value;
+  await Future.forEach(listingsMap.keys, (key) async {
+    listings[key] = await listingsMap[key];
 
-    final sortBy = configsMap[key].sortby.split(' ')[0];
-    final sortDirection = configsMap[key].sortby.split(' ')[1];
+    final sortBy = configsMap[key]?.sortby.split(' ')[0];
+    final sortDirection = configsMap[key]?.sortby.split(' ')[1];
 
     final asc = (dynamic a, dynamic b) =>
         a[sortBy].toString().compareTo(b[sortBy].toString());
@@ -46,8 +45,9 @@ Future<Map<String, List<Map>>> getListingsMap(
 
     _logger.info('SORT listing: $key BY: $sortBy');
 
-    listings[key].sort(sortFunction);
+    listings[key]?.sort(sortFunction);
   });
+
   return listings;
 }
 
@@ -86,9 +86,7 @@ Future<Map<String, dynamic>> _getFrontMatter(
   }
   try {
     return (await fm.parseFile(filePath, delimiter: yamldelimiter))
-        .data
-        .value
-        .cast<String, dynamic>();
+        .data.value.cast<String, dynamic>();
   } catch (e) {
     _logger.severe(e, 'failed parsing frontmatter in: $filePath');
     return <String, dynamic>{};
