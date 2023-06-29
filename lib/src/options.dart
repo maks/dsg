@@ -18,17 +18,13 @@ class Options {
   static const _ARG_INIT = 'init';
   static const _ARG_DOCROOT = 'docroot';
 
-  static const _ARG_USE_SASS = 'usesass';
-  static const _ARG_USE_AUTOPREFIXER = 'useapfx';
   static const _ARG_USE_SECURE_CONNECTION = 'usesec';
-  static const _ARG_TALK_TO_ME = 'talktome';
 
   final ArgParser _parser;
 
   Options() : _parser = Options._createParser();
 
   ArgResults parse(final List<String> args) {
-    Validate.notNull(args);
     return _parser.parse(args);
   }
 
@@ -75,20 +71,8 @@ class Options {
           negatable: false,
           help: 'Initializes your site\n(not combinable with other options)')
       ..addFlag(_ARG_SERVE, negatable: false, help: 'Serves your site')
-      ..addFlag(_ARG_USE_SASS,
-          negatable: true,
-          help: 'Enables / disables SASS to CSS compiler',
-          defaultsTo: true)
-      ..addFlag(_ARG_USE_AUTOPREFIXER,
-          negatable: true,
-          help: 'Enables / disables Autoprefixer',
-          defaultsTo: true)
       ..addFlag(_ARG_USE_SECURE_CONNECTION,
           negatable: false, help: 'Use secure connection', defaultsTo: false)
-      ..addFlag(_ARG_TALK_TO_ME,
-          negatable: true,
-          help: 'Enables / disables Speek-Output',
-          defaultsTo: _runsOnOSX())
       ..addOption(_ARG_IP,
           help: 'Sets the IP-Address to listen on', defaultsTo: '0.0.0.0')
       ..addOption(_ARG_PORT, help: 'Sets the port to listen on')

@@ -2,10 +2,10 @@ name: dsg
 description: "Static site generator. Supports markdown, mustache, partials, assets, sass. Webserver included."
 homepage: https://github.com/maks/dsg
 
-version: 1.0.4
+version: 2.0.0
 
 environment:
-  sdk: ">=2.8.0 <3.0.0"
+  sdk: ">=3.0.0 <4.0.0"
 
 # Add the bin/sitegen.dart script to the scripts pub installs.
 # Activate local repo:
@@ -15,29 +15,21 @@ executables:
   dsg:
 
 dependencies:
-  logging: '>=0.11.3 <1.0.0'
-  console_log_handler: ^1.0.0
-
-  validate: ^1.0.0
-
-  args: ^1.4.0
-  yaml: ^2.1.0
-  path: ^1.0.0
-  markdown: ^2.1.5
-  reflected_mustache: ^1.0.0
-  intl: ^0.16.1
-  http_server: ^0.9.0
-  system_info: ^0.1.0
-  where: ^8.0.0
-  packages: ^0.4.0
-  watcher: ^0.9.7
-  front_matter: ^1.1.0
+  args: ^2.4.2
+  checks: ^0.2.2
+  bonsai: ^1.0.1
+  yaml: ^3.1.2
+  path: ^1.8.3
+  markdown: ^7.1.0
+  mustache_template: ^2.0.0
+  intl: ^0.18.1
+  http_server: ^1.0.0
+  system_info_ml: ^1.0.0
+  watcher: ^1.1.0
+  front_matter_ml: ^1.2.0
     
 dev_dependencies:
   test: any
   grinder: any
-
   build_runner: any
   build_test: any
-
-  pedantic: ^1.8.0

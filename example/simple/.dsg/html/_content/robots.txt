@@ -1,1 +1,0 @@
-disallow: /foo.txt

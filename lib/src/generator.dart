@@ -3,8 +3,7 @@ part of dsg;
 /// Takes a template string (such as a Mustache template) and renders it out to an HTML string
 /// using the given input values/options.
 ///
-typedef TemplateRenderer = String Function(
-    String template, Map options, PartialsResolver resolver);
+typedef TemplateRenderer = String Function(String template, Map options, PartialsResolver resolver);
 
 /// Resolved partial-names into mustache.Templates
 typedef PartialsResolver = mustache.Template Function(String name);
@@ -16,24 +15,21 @@ String _outputFormat = 'MMMM dd yyyy';
 ///
 /// Uses [Mustache templates](https://pub.dartlang.org/packages/mustache) by default.
 ///
-TemplateRenderer renderTemplate =
-    (final String source, final Map options, final PartialsResolver resolver) {
-  final template = mustache.Template(source,
-      htmlEscapeValues: false, partialResolver: resolver, lenient: true);
+TemplateRenderer renderTemplate = (final String? source, final Map options, final PartialsResolver resolver) {
+  final template = mustache.Template(source ?? '', htmlEscapeValues: false, partialResolver: resolver, lenient: true);
 
   final inFormat = 'yyyy-MM-dd';
 
-  final formatDate = (mustache.LambdaContext ctx) =>
-      '${_parseDate(ctx.renderString(), inFormat, _outputFormat)}';
+  final formatDate = (mustache.LambdaContext ctx) => '${_parseDate(ctx.renderString(), inFormat, _outputFormat)}';
 
   options['formatDate'] = formatDate;
+
+  // print('===render: $source \n with opts:$options');
 
   return template.renderString(options);
 };
 
 class Generator {
-  final Logger _logger = Logger('dsg.Generator');
-
   /// Mustache-Renderer strips out newlines
   static const String _NEWLINE_PROTECTOR = '@@@#@@@';
 
@@ -49,97 +45,81 @@ class Generator {
 
     outputDir.createSync(); // ensure output dir exists
 
-    Validate.isTrue(
-        contentDir.existsSync(), 'ContentDir ${contentDir.path} must exist!');
-    Validate.isTrue(templateDir.existsSync(),
-        'Templatefolder ${templateDir.path} must exist!');
-    Validate.isTrue(
-        outputDir.existsSync(), 'OutputDir ${outputDir.path} must exist!');
+    check(contentDir.existsSync(), because: 'ContentDir ${contentDir.path} must exist!').isTrue();
+    check(templateDir.existsSync(), because: 'Templatefolder ${templateDir.path} must exist!').isTrue();
+    check(outputDir.existsSync(), because: 'OutputDir ${outputDir.path} must exist!').isTrue();
+
+    log('Assets Dir:$assetsDir');
+    log('Content Dir:$contentDir');
+    log('Templates Dir:$templateDir');
 
     final files = _listContentFilesIn(contentDir);
     final images = _listImagesFilesIn(contentDir);
     final assets = _listAssetsFilesIn(assetsDir);
     final templates = _listTemplatesIn(templateDir);
-    final dataFiles =
-        dataDir.existsSync() ? _listDataFilesIn(dataDir) : <File>[];
-    final listingsMap = listingsDir.existsSync()
-        ? await getListingsMap(listingsDir, config.yamldelimeter)
-        : null;
+    final dataFiles = dataDir.existsSync() ? _listDataFilesIn(dataDir) : <File>[];
+    final listingsMap = listingsDir.existsSync() ? await getListingsMap(listingsDir, config.yamldelimeter) : null;
 
     final dataMap = _getDataMap(dataFiles);
 
     _outputFormat = config.dateformat;
 
-    _logger.info('Listings... ${listingsMap?.keys}');
+    log('Listings... ${listingsMap?.keys}');
 
-    _logger.info('Generating .html files...');
+    log('Generating .html files...');
 
     for (final file in files) {
-      final relativeFileName =
-          file.path.replaceAll('${contentDir.path}', '').replaceFirst('/', '');
+      final relativeFileName = file.path.replaceAll('${contentDir.path}', '').replaceFirst('/', '');
       final relativePath = path.dirname(relativeFileName).replaceFirst('.', '');
-      final extension =
-          path.extension(relativeFileName).replaceFirst('.', '').toLowerCase();
+      final extension = path.extension(relativeFileName).replaceFirst('.', '').toLowerCase();
 
-      _logger.fine('\nFile: ${relativeFileName}, Path: $relativePath');
+      log('\nFile: ${relativeFileName}, Path: $relativePath');
 
       final fileContents = file.readAsStringSync();
       fm.FrontMatterDocument fmDocument;
       try {
         fmDocument = fm.parse(fileContents, delimiter: config.yamldelimeter);
       } catch (e) {
-        _logger.severe('Invalid Content File: ${file.path}');
+        log('Invalid Content File: ${file.path}');
         return;
       }
       var pageOptions = <String, dynamic>{};
 
-      if (fmDocument.data != null) {
-        pageOptions.addAll(
-            fmDocument.data.map<String, dynamic>((dynamic key, dynamic value) {
-          if (value is yaml.YamlList) {
-            return MapEntry<String, yaml.YamlList>(key.toString(), value);
-          }
-          if (value is yaml.YamlMap) {
-            return MapEntry<String, yaml.YamlMap>(key.toString(), value);
-          }
-          return MapEntry<String, String>(key.toString(), value.toString());
-        }));
+      final fmData = fmDocument.data;
 
-        _resolvePartialsInYamlBlock(
-            partialsDir, pageOptions, config.usemarkdown);
-      }
+      pageOptions.addAll(fmData.map<String, dynamic>((dynamic key, dynamic value) {
+        if (value is yaml.YamlList) {
+          return MapEntry<String, yaml.YamlList>(key.toString(), value);
+        }
+        if (value is yaml.YamlMap) {
+          return MapEntry<String, yaml.YamlMap>(key.toString(), value);
+        }
+        return MapEntry<String, String?>(key.toString(), value.toString());
+      }));
+
+      _resolvePartialsInYamlBlock(partialsDir, pageOptions, config.usemarkdown);
 
       pageOptions = _fillInPageNestingLevel(relativeFileName, pageOptions);
-      pageOptions = _fillInDefaultPageOptions(
-          config.dateformat, file, pageOptions, config.siteoptions);
+      pageOptions = _fillInDefaultPageOptions(config.dateformat, file, pageOptions, config.siteoptions);
       pageOptions['_data'] = dataMap;
       pageOptions['_lists'] = listingsMap;
-      pageOptions['_content'] = renderTemplate(
-          fmDocument.data != null ? fmDocument.content : fileContents,
-          pageOptions,
-          _partialsResolver(partialsDir,
-              isMarkdownSupported: config.usemarkdown));
+      pageOptions['_content'] = renderTemplate(fmDocument.content ?? fileContents, pageOptions,
+          _partialsResolver(partialsDir, isMarkdownSupported: config.usemarkdown));
 
       pageOptions['_template'] = 'none';
 
       var outputExtension = extension;
-      if (isMarkdown(file) &&
-          _isMarkdownSupported(config.usemarkdown, pageOptions)) {
-        pageOptions['_content'] = md.markdownToHtml(
-            pageOptions['_content'] as String,
-            inlineSyntaxes: [md.InlineHtmlSyntax()],
-            extensionSet: md.ExtensionSet.gitHubWeb);
+      if (isMarkdown(file) && _isMarkdownSupported(config.usemarkdown, pageOptions)) {
+        pageOptions['_content'] = md.markdownToHtml(pageOptions['_content'] as String,
+            inlineSyntaxes: [md.InlineHtmlSyntax()], extensionSet: md.ExtensionSet.gitHubWeb);
         outputExtension = 'html';
       }
 
-      var templateContent = '{{_content}}';
-      if ((fmDocument.data != null) &&
-          (pageOptions.containsKey('template') == false ||
-              pageOptions['template'] != 'none')) {
-        final template = _getTemplateFor(
-            file, pageOptions, templates, config.defaulttemplate);
+      String? templateContent = '{{_content}}';
+      if (pageOptions.containsKey('template') == false || pageOptions['template'] != 'none') {
+        final template = _getTemplateFor(file, pageOptions, templates, config.defaulttemplate);
         pageOptions['_template'] = template.path;
-        _logger.fine('Template: ${path.basename(template.path)}');
+        log('Template: ${path.basename(template.path)}');
 
         templateContent = template.readAsStringSync();
       }
@@ -150,53 +130,42 @@ class Generator {
 
       final content = _fixPathRefs(
           renderTemplate(
-              templateContent,
-              pageOptions,
-              _partialsResolver(partialsDir,
-                  isMarkdownSupported: config.usemarkdown)),
+              templateContent, pageOptions, _partialsResolver(partialsDir, isMarkdownSupported: config.usemarkdown)),
           config);
 
-      final outputFilename =
-          '${path.basenameWithoutExtension(relativeFileName)}.${outputExtension}';
+      final outputFilename = '${path.basenameWithoutExtension(relativeFileName)}.${outputExtension}';
       final outputPath = _createOutputPath(outputDir, relativePath);
       final outputFile = File('${outputPath.path}/$outputFilename');
 
       outputFile.writeAsStringSync(content);
-      final outputPathReplaced =
-          outputFile.path.replaceFirst(outputDir.path, '');
-      _logger.info('   $outputPathReplaced - done!');
+      final outputPathReplaced = outputFile.path.replaceFirst(outputDir.path, '');
+      log('   $outputPathReplaced - done!');
     }
 
     for (final image in images) {
-      final relativeFileName =
-          image.path.replaceAll('${contentDir.path}', '').replaceFirst('/', '');
+      final relativeFileName = image.path.replaceAll('${contentDir.path}', '').replaceFirst('/', '');
       final relativePath = path.dirname(relativeFileName).startsWith('.')
           ? path.dirname(relativeFileName)
           : path.dirname(relativeFileName).replaceFirst('.', '');
 
       final outputPath = _createOutputPath(outputDir, relativePath);
-      final outputFile =
-          File('${outputPath.path}/${path.basename(relativeFileName)}');
+      final outputFile = File('${outputPath.path}/${path.basename(relativeFileName)}');
       image.copySync(outputFile.path);
 
-      final outputPathReplaced =
-          outputFile.path.replaceFirst(outputDir.path, '');
-      _logger.info('image: $outputPathReplaced - copied!');
+      final outputPathReplaced = outputFile.path.replaceFirst(outputDir.path, '');
+      log('image: $outputPathReplaced - copied!');
     }
 
     for (final asset in assets) {
-      final relativeFileName =
-          asset.path.replaceAll('${assetsDir.path}', '').replaceFirst('/', '');
+      final relativeFileName = asset.path.replaceAll('${assetsDir.path}', '').replaceFirst('/', '');
       final relativePath = path.dirname(relativeFileName).replaceFirst('.', '');
 
       final outputPath = _createOutputPath(outputDir, relativePath);
-      final outputFile =
-          File('${outputPath.path}/${path.basename(relativeFileName)}');
+      final outputFile = File('${outputPath.path}/${path.basename(relativeFileName)}');
       asset.copySync(outputFile.path);
 
-      final outputPathReplaced =
-          outputFile.path.replaceFirst(outputDir.path, '');
-      _logger.info('asset: $outputPathReplaced - copied!');
+      final outputPathReplaced = outputFile.path.replaceFirst(outputDir.path, '');
+      log('asset: $outputPathReplaced - copied!');
     }
   }
 
@@ -211,15 +180,13 @@ class Generator {
   /// dart is the page-var.
   /// usage.badge.dart is the partial.
   ///
-  void _resolvePartialsInYamlBlock(final Directory partialsDir,
-      final Map<String, dynamic> pageOptions, bool useMarkdown) {
+  void _resolvePartialsInYamlBlock(
+      final Directory partialsDir, final Map<String, dynamic> pageOptions, bool useMarkdown) {
     pageOptions.keys.forEach((final String key) {
-      if (pageOptions[key] is String &&
-          (pageOptions[key] as String).contains('->')) {
-        final partial =
-            (pageOptions[key] as String).replaceAll(RegExp(r'[^>]*>'), '');
-        pageOptions[key] = renderTemplate('{{>${partial}}}', pageOptions,
-            _partialsResolver(partialsDir, isMarkdownSupported: useMarkdown));
+      if (pageOptions[key] is String && (pageOptions[key] as String).contains('->')) {
+        final partial = (pageOptions[key] as String).replaceAll(RegExp(r'[^>]*>'), '');
+        pageOptions[key] = renderTemplate(
+            '{{>${partial}}}', pageOptions, _partialsResolver(partialsDir, isMarkdownSupported: useMarkdown));
       }
     });
   }
@@ -229,10 +196,7 @@ class Generator {
   /// Example:
   /// Name: category.house -> category/house.[html | md]
   ///
-  PartialsResolver _partialsResolver(final Directory partialsDir,
-      {final bool isMarkdownSupported = true}) {
-    Validate.notNull(partialsDir);
-
+  PartialsResolver _partialsResolver(final Directory partialsDir, {final bool isMarkdownSupported = true}) {
     mustache.Template resolver(final String name) {
       final partialPath = partialsDir.path;
       final replacedName = name.replaceAll('.', '/');
@@ -259,10 +223,7 @@ class Generator {
     return resolver;
   }
 
-  Directory _createOutputPath(
-      final Directory outputDir, final String relativePath) {
-    Validate.notNull(outputDir);
-
+  Directory _createOutputPath(final Directory outputDir, final String relativePath) {
     final relPath = relativePath.isNotEmpty ? '/' : '';
     final outputPath = Directory('${outputDir.path}${relPath}${relativePath}');
     if (!outputPath.existsSync()) {
@@ -288,7 +249,6 @@ class Generator {
             (entity.path.endsWith('.md') ||
                 entity.path.endsWith('.markdown') ||
                 entity.path.endsWith('.dart') ||
-                entity.path.endsWith('.js') ||
                 entity.path.endsWith('.json') ||
                 entity.path.endsWith('.html') ||
                 entity.path.endsWith('.scss') ||
@@ -307,8 +267,7 @@ class Generator {
             (file.path.endsWith('.png') ||
                 file.path.endsWith('.jpg') ||
                 file.path.endsWith('.gif') ||
-                file.path.endsWith('.woff') ||
-                file.path.endsWith('.tff') ||
+                file.path.endsWith('.gif') ||
                 file.path.endsWith('.ico') ||
                 file.path.endsWith('.txt') ||
                 file.path.endsWith('webfinger') ||
@@ -329,8 +288,11 @@ class Generator {
             file is File &&
             (file.path.endsWith('.png') ||
                 file.path.endsWith('.jpg') ||
+                file.path.endsWith('.woff') ||
+                file.path.endsWith('.ttf') ||
                 file.path.endsWith('.scss') ||
                 file.path.endsWith('.css') ||
+                file.path.endsWith('.js') ||
                 file.path.endsWith('.svg')) &&
             !file.path.contains('packages'))
         .map((final FileSystemEntity entity) => entity as File)
@@ -356,18 +318,13 @@ class Generator {
         .toList();
   }
 
-  bool _isMarkdownSupported(
-      final bool markdownForSite, final Map page_options) {
+  bool _isMarkdownSupported(final bool markdownForSite, final Map page_options) {
     return markdownForSite ||
-        (page_options.containsKey('markdown_templating') &&
-            page_options['markdown_templating'] as bool);
+        (page_options.containsKey('markdown_templating') && page_options['markdown_templating'] as bool);
   }
 
-  Map<String, dynamic> _fillInDefaultPageOptions(
-      final String defaultDateFormat,
-      final File file,
-      final Map<String, dynamic> pageOptions,
-      final Map<String, String> siteOptions) {
+  Map<String, dynamic> _fillInDefaultPageOptions(final String defaultDateFormat, final File file,
+      final Map<String, dynamic> pageOptions, final Map<String, String> siteOptions) {
     final filename = path.basenameWithoutExtension(file.path);
     pageOptions.putIfAbsent('title', () => filename);
 
@@ -415,9 +372,8 @@ class Generator {
   ///     <a href="index.html" class="mdl-layout__tab is-active">Overview</a>
   ///  if the current page is index.html
   ///
-  Map<String, dynamic> _fillInPageNestingLevel(
-      final String relativeFileName, Map<String, dynamic> pageOptions) {
-    Validate.notBlank(relativeFileName);
+  Map<String, dynamic> _fillInPageNestingLevel(final String relativeFileName, Map<String, dynamic> pageOptions) {
+    check(relativeFileName).isNotEmpty();
 
     var backPath = '';
     var nestingLevel = 0;
@@ -430,8 +386,7 @@ class Generator {
 
     final pathWithoutExtension = path.withoutExtension(relativeFileName);
     // final String portablePath = pathWithoutExtension.replaceAll( RegExp('(/|\\\\\)'),':');
-    final pageIndicator =
-        pathWithoutExtension.replaceAll(RegExp('(/|\\\\\)'), '_');
+    final pageIndicator = pathWithoutExtension.replaceAll(RegExp('(/|\\\\\)'), '_');
     pageOptions['_page'] = {
       'filename': pathWithoutExtension,
       'pageindicator': pageIndicator,
@@ -446,8 +401,8 @@ class Generator {
     return pageOptions;
   }
 
-  File _getTemplateFor(final File file, final Map page_options,
-      final List<File> templates, final String defaultTemplate) {
+  File _getTemplateFor(
+      final File file, final Map page_options, final List<File> templates, final String defaultTemplate) {
     final filenameWithoutExtension = path.basenameWithoutExtension(file.path);
     final filepath = path.normalize(file.path);
 
@@ -456,18 +411,15 @@ class Generator {
 
     try {
       if (page_options.containsKey('template')) {
-        template = templates.firstWhere((final File file) =>
-            path.basenameWithoutExtension(file.path) ==
-            page_options['template']);
+        template = templates
+            .firstWhere((final File file) => path.basenameWithoutExtension(file.path) == page_options['template']);
       } else if (defaultTemplate.isNotEmpty) {
         template = templates.firstWhere((final File file) {
-          return path.basenameWithoutExtension(file.path) ==
-              path.basenameWithoutExtension(defaultTemplate);
+          return path.basenameWithoutExtension(file.path) == path.basenameWithoutExtension(defaultTemplate);
         });
       } else {
-        template = templates.firstWhere((final File file) =>
-            path.basenameWithoutExtension(file.path) ==
-            filenameWithoutExtension);
+        template = templates
+            .firstWhere((final File file) => path.basenameWithoutExtension(file.path) == filenameWithoutExtension);
       }
     } catch (e) {
       throw 'No template given for $filepath!';
@@ -480,53 +432,41 @@ class Generator {
   /// Currently only supports replacing Unix-style relative paths.
   ///
   String _fixPathRefs(String html, final Config config) {
-    var relative_output =
-        path.relative(config.outputfolder, from: config.templatefolder);
+    var relative_output = path.relative(config.outputfolder, from: config.templatefolder);
 
     relative_output = '$relative_output/'.replaceAll('\\', '/');
     //_logger.info(relative_output);
 
-    html = html
-        .replaceAll('src="$relative_output', 'src="')
-        .replaceAll('href="$relative_output', 'href="');
+    html = html.replaceAll('src="$relative_output', 'src="').replaceAll('href="$relative_output', 'href="');
 
     return html;
   }
 
   /// Shows all the available vars for the current page
   ///
-  void _showPageOptions(
-      final String relativeFileName,
-      final String relativePath,
-      final Map<String, dynamic> pageOptions,
-      final Config config) {
-    Validate.notBlank(relativeFileName);
-    Validate.notNull(relativePath);
-    Validate.notNull(pageOptions);
-    Validate.notNull(config);
+  void _showPageOptions(final String relativeFileName, final String relativePath,
+      final Map<String, dynamic> pageOptions, final Config config) {
+    check(relativeFileName).isNotEmpty();
 
-    _logger.fine('   --- ${(relativeFileName + " ").padRight(76, "-")}');
+    log('   --- ${(relativeFileName + " ").padRight(76, "-")}');
 
     void _showMap(final Map<String, dynamic> values, final int nestingLevel) {
       values.forEach((final String key, final dynamic value) {
-        _logger.fine('    ${"".padRight(nestingLevel * 2)} $key.');
+        log('    ${"".padRight(nestingLevel * 2)} $key.');
 
         if (value is Map) {
           _showMap(value as Map<String, dynamic>, nestingLevel + 1);
         } else {
-          var valueAsString = value.toString().replaceAll(
-              RegExp('(\n|\r|\\s{2,}|${_NEWLINE_PROTECTOR})', multiLine: true),
-              '');
+          var valueAsString =
+              value.toString().replaceAll(RegExp('(\n|\r|\\s{2,}|${_NEWLINE_PROTECTOR})', multiLine: true), '');
 
-          valueAsString =
-              valueAsString.substring(0, min(50, max(valueAsString.length, 0)));
-          _logger.fine(
-              '    ${"".padRight(nestingLevel * 2)} $key -> [${valueAsString}]');
+          valueAsString = valueAsString.substring(0, math.min(50, math.max(valueAsString.length, 0)));
+          log('    ${"".padRight(nestingLevel * 2)} $key -> [${valueAsString}]');
         }
       });
     }
 
     _showMap(pageOptions, 0);
-    _logger.fine('   ${"".padRight(80, "-")}');
+    log('   ${"".padRight(80, "-")}');
   }
 }

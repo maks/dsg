@@ -1,3 +1,9 @@
+# v2.0.0
+
+* updated to full null safety
+* removed support for sass, autoprefixer and say
+* removed old code, examples, etc
+
 # v1.0.4
 
 * cleanup code
