@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 part of dsg;
 
 /// Defines default-configurations.
@@ -36,12 +38,12 @@ class Config {
   Config(this._argResults) {
     _settings[Options._ARG_LOGLEVEL] = 'info';
 
-    _settings[Config._CONF_CONTENT_DIR] = '${_CONFIG_FOLDER}/html/_content';
-    _settings[Config._CONF_TEMPLATE_DIR] = '${_CONFIG_FOLDER}/html/_templates';
-    _settings[Config._CONF_DATA_DIR] = '${_CONFIG_FOLDER}/html/_data';
-    _settings[Config._CONF_LISTINGS_DIR] = '${_CONFIG_FOLDER}/html/_listings';
-    _settings[Config._CONF_PARTIALS_DIR] = '${_CONFIG_FOLDER}/html/_partials';
-    _settings[Config._CONF_ASSETS_DIR] = '${_CONFIG_FOLDER}/html/_assets';
+    _settings[Config._CONF_CONTENT_DIR] = '$_CONFIG_FOLDER/html/_content';
+    _settings[Config._CONF_TEMPLATE_DIR] = '$_CONFIG_FOLDER/html/_templates';
+    _settings[Config._CONF_DATA_DIR] = '$_CONFIG_FOLDER/html/_data';
+    _settings[Config._CONF_LISTINGS_DIR] = '$_CONFIG_FOLDER/html/_listings';
+    _settings[Config._CONF_PARTIALS_DIR] = '$_CONFIG_FOLDER/html/_partials';
+    _settings[Config._CONF_ASSETS_DIR] = '$_CONFIG_FOLDER/html/_assets';
 
     _settings[Config._CONF_OUTPUT_DIR] = 'web';
     _settings[Config._CONF_WORKSPACE_DIR] = '.';
@@ -182,8 +184,9 @@ class Config {
   void printSettings() {
     int getMaxKeyLength() {
       var length = 0;
-      settings.keys
-          .forEach((final String key) => length = math.max(length, key.length));
+      for (var key in settings.keys) {
+        length = math.max(length, key.length);
+      }
       return length;
     }
 
@@ -199,14 +202,14 @@ class Config {
 
     print('Settings:');
     settings.forEach((final String key, final value) {
-      print('    ${prepareKey(key)} ${value}');
+      print('    ${prepareKey(key)} $value');
     });
   }
 
   void printSiteKeys() {
-    print('Keys for ${configfile}:');
+    print('Keys for $configfile:');
     _settings.forEach((final String key, final dynamic value) {
-      print('    ${(key + ':').padRight(20)} $value');
+      print('    ${('$key:').padRight(20)} $value');
     });
   }
 
@@ -234,17 +237,17 @@ class Config {
   }
 
   void _overwriteSettingsWithConfigFile() {
-    final file = File('${configfolder}/${configfile}');
+    final file = File('$configfolder/$configfile');
     if (!file.existsSync()) {
       return;
     }
     final map = yaml.loadYaml(file.readAsStringSync()) as yaml.YamlMap;
-    _settings.keys.forEach((final String key) {
+    for (var key in _settings.keys) {
       if (map.containsKey(key)) {
         _settings[key] = map[key];
         print('Found $key in $configfile: ${map[key]}');
       }
-    });
+    }
   }
 
   Map<String, String> _toMap(final dynamic configOption) {

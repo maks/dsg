@@ -103,21 +103,21 @@ class Application {
 
     final ip = config.ip;
     final port = config.port;
-    final MY_HTTP_ROOT_PATH =
+    final myHttpRootPath =
         config.docroot; //Platform.script.resolve(folder).toFilePath();
 
     late VirtualDirectory virtDir;
-    void _directoryHandler(final Directory dir, final HttpRequest request) {
+    void directoryHandler(final Directory dir, final HttpRequest request) {
       log('$dir');
       final indexUri = Uri.file(dir.path).resolve('index.html');
       virtDir.serveFile(File(indexUri.toFilePath()), request);
     }
 
-    virtDir = VirtualDirectory(MY_HTTP_ROOT_PATH)
+    virtDir = VirtualDirectory(myHttpRootPath)
       ..allowDirectoryListing = true
       ..followLinks = true
       ..jailRoot = false;
-    virtDir.directoryHandler = _directoryHandler;
+    virtDir.directoryHandler = directoryHandler;
 
     Future<HttpServer> connect;
     if (config.usesecureconnection) {
@@ -130,18 +130,18 @@ class Application {
       connect = HttpServer.bind(ip, int.parse(port));
     }
 
-    runZoned(() {
-      connect.then((final server) {
-        log('Server running $ip on port: $port, $MY_HTTP_ROOT_PATH');
+    runZonedGuarded(() {
+        connect.then((final server) {
+        log('Server running $ip on port: $port, $myHttpRootPath');
         server.listen((final request) {
           log('${request.connectionInfo?.remoteAddress.address}:${request.connectionInfo?.localPort} - ${request.method} ${request.uri}');
           
           virtDir.serveRequest(request); 
         });
       });
-    },
-        onError: (Object e, StackTrace stackTrace) =>
-            Log.e('Error running http server: $e $stackTrace'));
+    }, (error, stack) { 
+      Log.e('Error running http server: $error $stack');
+    });        
   }
 
   void watch(final String folder, final Config config) {

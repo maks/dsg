@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:bonsai/bonsai.dart';
 import 'package:dsg/dsg.dart';
 
-Future main(List<String> arguments) async {
+Future<void> main(List<String> arguments) async {
   const debug = true;
   if (debug) {
     Log.init(true);

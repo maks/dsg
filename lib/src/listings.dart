@@ -1,11 +1,9 @@
 import 'dart:io';
 
+import 'package:bonsai/bonsai.dart';
 import 'package:front_matter_ml/front_matter_ml.dart' as fm;
-import 'package:logging/logging.dart';
 import 'package:path/path.dart' as path;
 import 'package:yaml/yaml.dart' as yaml;
-
-final Logger _logger = Logger('dsg.Generator');
 
 class ListingConfig {
   final Map<dynamic, dynamic> _config;
@@ -19,7 +17,7 @@ class ListingConfig {
 /// Returns a Map, wher each key is the name of "listing",
 /// the a listing is a List of Maps, where each Map represents the
 /// metadata for a MD file, including any YAMl Frontmatter that file has
-Future<Map<String, List<Map>?>> getListingsMap(
+Future<Map<String, List<Map<dynamic, dynamic>>?>> getListingsMap(
     Directory dir, String yamlDelimiter) async {
   final listingConfigs = _listingsFilesIn(dir);
 
@@ -28,7 +26,7 @@ Future<Map<String, List<Map>?>> getListingsMap(
   final listingsMap = configsMap
       .map((key, value) => MapEntry(key, _dirList(value, yamlDelimiter)));
 
-  final listings = <String, List<Map>?>{};
+  final listings = <String, List<Map<dynamic, dynamic>>?>{};
 
   await Future.forEach(listingsMap.keys, (key) async {
     listings[key] = await listingsMap[key];
@@ -36,14 +34,14 @@ Future<Map<String, List<Map>?>> getListingsMap(
     final sortBy = configsMap[key]?.sortby.split(' ')[0];
     final sortDirection = configsMap[key]?.sortby.split(' ')[1];
 
-    final asc = (dynamic a, dynamic b) =>
+    asc(dynamic a, dynamic b) =>
         a[sortBy].toString().compareTo(b[sortBy].toString());
-    final desc = (dynamic a, dynamic b) =>
+    desc(dynamic a, dynamic b) =>
         b[sortBy].toString().compareTo(a[sortBy].toString());
 
     final sortFunction = (sortDirection == 'DESC') ? desc : asc;
 
-    _logger.info('SORT listing: $key BY: $sortBy');
+    Log.d('listings.dart', 'SORT listing: $key BY: $sortBy');
 
     listings[key]?.sort(sortFunction);
   });
@@ -88,7 +86,7 @@ Future<Map<String, dynamic>> _getFrontMatter(
     return (await fm.parseFile(filePath, delimiter: yamldelimiter))
         .data.value.cast<String, dynamic>();
   } catch (e) {
-    _logger.severe(e, 'failed parsing frontmatter in: $filePath');
+    Log.e('failed parsing frontmatter in: $filePath', e);
     return <String, dynamic>{};
   }
 }
@@ -97,7 +95,7 @@ Future<Map<String, dynamic>> _getFrontMatter(
 Map<String, ListingConfig> _getListingConfigMap(final List<File> listingFiles) {
   final listingMap = <String, ListingConfig>{};
 
-  listingFiles.forEach((final File file) {
+  for (var file in listingFiles) {
     if (file.existsSync()) {
       dynamic data;
       if (path.extension(file.path) == '.yaml') {
@@ -106,7 +104,7 @@ Map<String, ListingConfig> _getListingConfigMap(final List<File> listingFiles) {
       final filename = path.basenameWithoutExtension(file.path).toLowerCase();
       listingMap[filename] = ListingConfig((data as yaml.YamlMap).value);
     }
-  });
+  }
   return listingMap;
 }
 
