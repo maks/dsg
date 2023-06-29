@@ -1,11 +1,9 @@
 import 'dart:io';
 
+import 'package:bonsai/bonsai.dart';
 import 'package:front_matter_ml/front_matter_ml.dart' as fm;
-import 'package:logging/logging.dart';
 import 'package:path/path.dart' as path;
 import 'package:yaml/yaml.dart' as yaml;
-
-final Logger _logger = Logger('dsg.Generator');
 
 class ListingConfig {
   final Map<dynamic, dynamic> _config;
@@ -43,7 +41,7 @@ Future<Map<String, List<Map>?>> getListingsMap(
 
     final sortFunction = (sortDirection == 'DESC') ? desc : asc;
 
-    _logger.info('SORT listing: $key BY: $sortBy');
+    Log.d('listings.dart', 'SORT listing: $key BY: $sortBy');
 
     listings[key]?.sort(sortFunction);
   });
@@ -88,7 +86,7 @@ Future<Map<String, dynamic>> _getFrontMatter(
     return (await fm.parseFile(filePath, delimiter: yamldelimiter))
         .data.value.cast<String, dynamic>();
   } catch (e) {
-    _logger.severe(e, 'failed parsing frontmatter in: $filePath');
+    Log.e('failed parsing frontmatter in: $filePath', e);
     return <String, dynamic>{};
   }
 }

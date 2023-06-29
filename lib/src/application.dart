@@ -130,8 +130,8 @@ class Application {
       connect = HttpServer.bind(ip, int.parse(port));
     }
 
-    runZoned(() {
-      connect.then((final server) {
+    runZonedGuarded(() {
+        connect.then((final server) {
         log('Server running $ip on port: $port, $MY_HTTP_ROOT_PATH');
         server.listen((final request) {
           log('${request.connectionInfo?.remoteAddress.address}:${request.connectionInfo?.localPort} - ${request.method} ${request.uri}');
@@ -139,9 +139,9 @@ class Application {
           virtDir.serveRequest(request); 
         });
       });
-    },
-        onError: (Object e, StackTrace stackTrace) =>
-            Log.e('Error running http server: $e $stackTrace'));
+    }, (error, stack) { 
+      Log.e('Error running http server: $error $stack');
+    });        
   }
 
   void watch(final String folder, final Config config) {
