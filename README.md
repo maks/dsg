@@ -14,7 +14,7 @@ Includes support for:
 
 You can either install dsg with pub:
 ```
-pub global activate dsg
+dart pub global activate dsg
 ```
 
 or you can just download the self-contained executable for your platform from the [Github repo](https://github.com/maks/dsg/actions).
@@ -24,8 +24,8 @@ See [this article on how DSG came to be and how you can use it to deploy your we
 ## Example
 
    - Install DSG (see above)
-   - Clone the example from `https://github.com/maks/dsg/tree/master/samples/simple`
-   - cd into the local `simple` git repo
+   - Download the sample [simple.tgz](https://github.com/jsiedentop/dsg/blob/main/downloads/simple.tgz)
+   - cd into the local `simple` dictionary
    - run `dsg -x`
 
 Play with the sample files...
@@ -34,8 +34,7 @@ Play with the sample files...
 This is absolutely mandatory if your REST-Server
 uses [HTTP Strict Transport Security (HSTS)](https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security)
 
-[Here](https://github.com/maks/dsg/blob/master/samples/simple/.sitegen/site.yaml) 
-you can see the necessary configuration for HTTPS-Support   
+At `samples/simple/.sitegen/site.yaml`` you can see the necessary configuration for HTTPS-Support   
 Generate a self-signed certificate, name it dart.cert and dart.key, place it under <project root>/etc 
 and run `dsg -x --usesec` and - voila. That's it!
 
@@ -49,14 +48,13 @@ A webserver for a quick previews is included. On Mac you also get automatic page
 platforms you could try [LivePage](https://chrome.google.com/webstore/detail/livepage/pilnojpmdoofaelbinaeodfpjheijkbh) 
 chrome extension for maximum productivity.  
 
-[Here](https://github.com/maks/dsg/tree/master/sample/simple) you can see a typical site structure.
+main
+You can see a [typical site structure](https://github.com/maks/dsg/tree/main/build/samples/simple) in this repository. For a working example, please download the [simple.tgz](https://github.com/jsiedentop/dsg/blob/main/downloads/simple.tgz), that contains all the necessary configuration files. 
 
 See [manichord.com](https://manichord.com) for a site built entirely with DSG.   
 
-Check out the [sample!](https://github.com/maks/dsg/tree/master/samples/simple).
-
 ```
-├── .dsg
+├── .sitegen
 │   ├── html
 │   │   ├── _content
 │   │   │   ├── about
@@ -78,20 +76,23 @@ Check out the [sample!](https://github.com/maks/dsg/tree/master/samples/simple).
 │   │   │   └── technology.html
 │   │   ├── _data
 │   │   │   ├── families.json
+│   │   │   ├── items.json
 │   │   │   ├── menu.json
+│   │   │   ├── sitemap.json
 │   │   │   └── xmen.yaml
 │   │   ├── _partials
 │   │   │   ├── cards
 │   │   │   │   └── wide.html
 │   │   │   └── header.html
+│   │   │   └── list.html
 │   │   └── _templates
 │   │       ├── default.html
 │   │       └── info_page.html
-│   ├── refreshChrome-1.0.applescript
-│   ├── refreshChromium-1.0.applescript
-│   ├── refreshDartium-1.0.applescript
 │   └── site.yaml
 ├── pubspec.yaml
+└── etc
+    ├── dart.crt
+    └── dart.key
 └── web
     ├── about
     │   └── index.html
@@ -113,11 +114,11 @@ Check out the [sample!](https://github.com/maks/dsg/tree/master/samples/simple).
     └── technology.html
 ```
 
-**.dsg**: This is where your (optional) site.yaml lives  
+**.sitegen**: This is where your (optional) site.yaml lives  
 This folder is also used to store autgenerated scripts - in the case above you can see
 the script to refresh Chromium on Mac.
 
-**.dsg/html/_content**: This is where **DSG** will look for your files to generate the site from.
+**.sitegen/html/_content**: This is where **DSG** will look for your files to generate the site from.
 The following file-formats are supported:
 
 - .md
@@ -129,9 +130,8 @@ The following file-formats are supported:
 - .scss
 - .css
 
-**.dsg/html/_data**: [optional] This is the place where you can store your data-files.  
+**.sitegen/html/_data**: [optional] This is the place where you can store your data-files.  
 The following file-formats are supported:
-
 - .yaml
 - .json
 
@@ -146,10 +146,10 @@ Here is a sample how to use such data:
 </ul>
 ```
 
-**.dsg/html/_listings**: [optional] This is the place where you can store your listings configuration files.  
+**.sitegen/html/_listings**: [optional] This is the place where you can store your listings configuration files.  
 Listing files are in yaml format with the following parameters supported: `path`, `filter`, `sort_by`
 
-The `path` is a path relative to `.dsg/html/_content`.
+The `path` is a path relative to `.sitegen/html/_content`.
 The `filter` specifies which files to list within the given path.
 The `sort_by` specifies a property **AND** the `ASC` or `DESC`.
 
@@ -176,7 +176,7 @@ Here is a sample how to use a listing:
 </ul>
 ```
 
-**.dsg/html/_assets**: [optional] Additional assets that you don't want to have in _content. The following file types are supported:
+**.sitegen/html/_assets**: [optional] Additional assets that you don't want to have in _content. The following file types are supported:
 * .scss 
 * .jpg
 * .png
@@ -185,13 +185,13 @@ Here is a sample how to use a listing:
 * .ttf
 * .pdf
 
-**.dsg/html/_templates**: The directory containing your HTML+Mustache templates.
+**.sitegen/html/_templates**: The directory containing your HTML+Mustache templates.
 
 **web**: Following Dart conventions - this is your default **output** directory.
 
 ### Top-level files
 
-Sometimes you will need to place specific files in the top level of your website, for example `favicon.ico` or `robots.txt`. These files can simply be placed in the `.dsg/html/_content` folder and will then be copied across to the `web` output folder. See the sample website in `example/simple` folder of this git repo for an example.
+Sometimes you will need to place specific files in the top level of your website, for example `favicon.ico` or `robots.txt`. These files can simply be placed in the `.sitegen/html/_content` folder and will then be copied across to the `web` output folder. See the [simple.tgz](https://github.com/jsiedentop/dsg/blob/main/downloads/simple.tgz).
 
 
 ## site.yaml
@@ -211,11 +211,11 @@ Can be used in your template (default.html) as
 You can also use site.yaml to overwrite your **dsg** default configuration.  
 Supported vars:
 
-- content_dir: .dsg/html/_content 
-- template_dir: .dsg/html/_templates
-- data_dir: .dsg/html/_data
-- partials_dir: .dsg/html/_partials
-- assets_dir: .dsg/html/_assets
+- content_dir: .sitegen/html/_content 
+- template_dir: .sitegen/html/_templates
+- data_dir: .sitegen/html/_data
+- partials_dir: .sitegen/html/_partials
+- assets_dir: .sitegen/html/_assets
 - output_dir: web
 - workspace: .
 - date_format: dd.MM.yyyy
@@ -320,18 +320,18 @@ will output: `Article published on: 26 Jan 2020`
 # Install
 Install
 ```shell
-    pub global activate dsg
+    dart pub global activate dsg
 ```
 
 Update
 ```shell
     # activate dsg again
-    pub global activate dsg
+    dart pub global activate dsg
 ```
 
 Uninstall
 ```shell
-    pub global deactivate dsg   
+    dart pub global deactivate dsg   
 ```    
     
 ## Usage    
@@ -390,10 +390,10 @@ If you are using Chromium on Mac you will get a automatic page refresh for free!
     file - set watchfolder[1-3] in you site.yaml
     
 - Test your App with Chrome and use dsg as server (MAC + Linux only)  
-    `pub build && cd build/web && dsg --serve --port 9000 --docroot . || cd -`
+    `dart pub build && cd build/web && dsg --serve --port 9000 --docroot . || cd -`
     
     *Explanation:*  
-    Runs "pub build" - if this runs without errors cd to "build/web"
+    Runs "dart pub build" - if this runs without errors cd to "build/web"
     In "build/web" run dsg as server on port 9000 and set docroot to . (current dir (default would be "web"))  
     || means if the prev command ends with an error (Ctrl + C to cancel dsg)   
     jump back where you came from. You should be back in your base folder (where your pubspec.yaml is)
